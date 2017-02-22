@@ -125,10 +125,6 @@
             [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
         }
         
-        
-
-        
-        
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [self hideHud];
         

@@ -27,22 +27,18 @@
     
     UIBarButtonItem *item = [[UIBarButtonItem alloc]initWithCustomView:[UIButton buttonWithType:UIButtonTypeCustom]];
     
-    
-    
     UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(save)];
     [item2 setTintColor:[UIColor whiteColor]];
-    
-    
     
     self.navigationItem.rightBarButtonItems = @[item1,item,item2];
 }
 
 -(void)submit{
-    
+    DLog(@"提交");
 }
 
 -(void)save{
-    
+    DLog(@"保存");
 }
 
 - (void)didReceiveMemoryWarning {
