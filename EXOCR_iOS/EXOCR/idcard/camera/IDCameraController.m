@@ -1,0 +1,1281 @@
+
+#import <UIKit/UIKit.h>
+#import "IDCameraController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import "IDContextManager.h"
+#import "sys/sysctl.h"
+
+/////////////////////////////////////////////////////////
+//int  nType = 0;
+//int  nRate = 0;
+//int  nCharNum = 0;
+//
+//char numbers[256];
+//CGRect rects[64];
+//CGRect subRect;
+
+/////////////////////////////////////////////////////////
+@import CoreImage;
+
+static long lFrameCount = 0;
+@interface IDCameraController () <AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate,AVCaptureMetadataOutputObjectsDelegate>
+{
+    BOOL bFirstTime;
+    BOOL bNotLessThan5s;
+}
+
+@property (strong, nonatomic) AVCaptureSession *captureSession;
+@property (weak, nonatomic) AVCaptureDeviceInput *activeVideoInput;
+
+@property (strong, nonatomic) AVCaptureStillImageOutput *imageOutput;
+@property (strong, nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
+@property (strong, nonatomic) AVCaptureAudioDataOutput *audioDataOutput;
+@property (strong, nonatomic) AVCaptureMetadataOutput *medaDataOutput;
+@property (strong, nonatomic) AVAssetWriter *assetWriter;
+@property (strong, nonatomic) AVAssetWriterInput *assetWriterVideoInput;
+@property (strong, nonatomic) AVAssetWriterInputPixelBufferAdaptor *assetWriterInputPixelBufferAdaptor;
+@property (strong, nonatomic) AVAssetWriterInput *assetWriterAudioInput;
+@property (strong, nonatomic) NSMutableDictionary *videoSettings;
+@property (strong, nonatomic) NSDictionary *audioSettings;
+@property (strong, nonatomic) dispatch_queue_t captureQueue;
+@property (assign, nonatomic) CMTime startTime;
+@property (assign, nonatomic) BOOL isWriting;
+@property (assign, nonatomic) BOOL firstSample;
+@property (strong, nonatomic) NSURL *outputURL;
+
+@property (nonatomic, assign, readwrite) NSTimeInterval recordedDuration;
+
+@property (nonatomic, strong) NSArray *faceObjects;
+
+@property (nonatomic, strong) CIFilter *filter;
+@property (nonatomic, strong) CIContext *ciContext;
+@property (nonatomic, strong) EAGLContext *eaglContext;
+
+@end
+
+@implementation IDCameraController
+static IdInfo *idInfo;
+@synthesize bInProcessing;
+@synthesize bHasResult;
+@synthesize bShouldStop;
+
+- (void)resetRecParams
+{
+    bInProcessing = NO;
+    bHasResult = NO;
+    if ([self.captureSession canAddOutput:self.videoDataOutput]) {
+        [self.captureSession addOutput:self.videoDataOutput];
+        NSLog(@"captureSession addOutput");
+    }
+
+}
+
+- (BOOL)setupSession:(NSError **)error {
+    bInProcessing = NO;
+    bHasResult = NO;
+    bFirstTime = YES;
+    self.bShowCutImg = NO;
+    bNotLessThan5s = [self NotLessThan5s];
+    
+    self.filterEnable = YES;
+    self.filter = [CIFilter filterWithName:@"CIPixellate"];
+    self.eaglContext = [IDContextManager sharedInstance].eaglContext;
+    self.ciContext = [IDContextManager sharedInstance].ciContext;
+
+    
+    // Dispatch Setup
+    self.captureQueue = dispatch_queue_create("com.kimsungwhee.mosaiccamera.videoqueue", NULL);
+	self.captureSession = [[AVCaptureSession alloc] init];
+	[self.captureSession beginConfiguration];
+	self.captureSession.sessionPreset = self.sessionPreset;
+
+	// Set up default camera device
+	AVCaptureDevice *videoDevice =
+	    [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+
+	AVCaptureDeviceInput *videoInput =
+	    [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:error];
+	if (videoInput) {
+		if ([self.captureSession canAddInput:videoInput]) {
+			[self.captureSession addInput:videoInput];
+			self.activeVideoInput = videoInput;
+		}
+	}
+	else {
+        [self.captureSession commitConfiguration];
+		return NO;
+	}
+
+	
+	//VideoOutput Setup
+	self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+	self.videoDataOutput.alwaysDiscardsLateVideoFrames = YES;
+	[self.videoDataOutput setSampleBufferDelegate:self queue:self.captureQueue];
+
+	self.videoDataOutput.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+	                                      [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange], (id)kCVPixelBufferPixelFormatTypeKey,
+	                                      nil];
+
+
+	if ([self.captureSession canAddOutput:self.videoDataOutput]) {
+		[self.captureSession addOutput:self.videoDataOutput];
+	}
+	else {
+        [self.captureSession commitConfiguration];
+		return NO;
+	}
+
+    
+    AVCaptureConnection *videoConnection;
+    
+    for (AVCaptureConnection *connection in[self.videoDataOutput connections]) {
+        for (AVCaptureInputPort *port in[connection inputPorts]) {
+            if ([[port mediaType] isEqual:AVMediaTypeVideo]) {
+                videoConnection = connection;
+            }
+        }
+    }
+    
+    
+    if ([videoConnection isVideoStabilizationSupported]) {
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
+            videoConnection.enablesVideoStabilizationWhenAvailable = YES;
+        }
+        else {
+            videoConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeAuto;
+        }
+    }
+    
+    AVCaptureDevice *device = [self activeCamera];
+    
+    // Use Smooth focus
+    if( YES == [device lockForConfiguration:NULL] )
+    {
+        if([device respondsToSelector:@selector(setSmoothAutoFocusEnabled:)] && [device isSmoothAutoFocusSupported] )
+        {
+            [device setSmoothAutoFocusEnabled:YES];
+        }
+        AVCaptureFocusMode currentMode = [device focusMode];
+        if( currentMode == AVCaptureFocusModeLocked )
+        {
+            currentMode = AVCaptureFocusModeAutoFocus;
+        }
+        if(bNotLessThan5s) {
+            currentMode = AVCaptureFocusModeContinuousAutoFocus;
+        } else {
+            currentMode = AVCaptureFocusModeAutoFocus;
+        }
+        if( [device isFocusModeSupported:currentMode] )
+        {
+            [device setFocusMode:currentMode];
+        }
+        [device unlockForConfiguration];
+    }
+
+	[self.captureSession commitConfiguration];
+
+//	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+	return YES;
+}
+
+- (void)startSession {
+    bHasResult = NO;
+    bShouldStop = NO;
+    idInfo = nil;
+	if (![self.captureSession isRunning]) {
+		dispatch_async([self globalQueue], ^{
+		    [self.captureSession startRunning];
+		});
+	}
+}
+
+- (void)stopSession {
+	if ([self.captureSession isRunning]) {
+		dispatch_async([self globalQueue], ^{
+		    [self.captureSession stopRunning];
+		});
+	}
+}
+
+- (void)deviceOrientationChanged:(id)sender {
+	dispatch_sync([self globalQueue], ^{
+	    if (self.isWriting) {
+	        return;
+		}
+	    [self updateOrientation];
+	});
+}
+
+- (void)updateOrientation {
+	AVCaptureConnection *videoConnection;
+
+	for (AVCaptureConnection *connection in[self.videoDataOutput connections]) {
+		for (AVCaptureInputPort *port in[connection inputPorts]) {
+			if ([[port mediaType] isEqual:AVMediaTypeVideo]) {
+				videoConnection = connection;
+			}
+		}
+	}
+
+
+	if ([videoConnection isVideoOrientationSupported]) {
+		videoConnection.videoOrientation = self.currentVideoOrientation;
+	}
+
+	if ([videoConnection isVideoStabilizationSupported]) {
+		if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
+			videoConnection.enablesVideoStabilizationWhenAvailable = YES;
+		}
+		else {
+			videoConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeAuto;
+		}
+	}
+
+	AVCaptureDevice *device = [self activeCamera];
+
+    // Use Smooth focus
+    NSError *error;
+    if( YES == [device lockForConfiguration:NULL] )
+    {
+        if( [device isSmoothAutoFocusSupported] )
+        {
+            [device setSmoothAutoFocusEnabled:YES];
+        }
+        AVCaptureFocusMode currentMode = [device focusMode];
+        if( currentMode == AVCaptureFocusModeLocked )
+        {
+            currentMode = AVCaptureFocusModeAutoFocus;
+        }
+        if(bNotLessThan5s) {
+            currentMode = AVCaptureFocusModeContinuousAutoFocus;
+        } else {
+            currentMode = AVCaptureFocusModeAutoFocus;
+        }
+        if( [device isFocusModeSupported:currentMode] )
+        {
+            [device setFocusMode:currentMode];
+        }
+        [device unlockForConfiguration];
+    }else {
+        [self.delegate deviceConfigurationFailedWithError:error];
+    }
+
+}
+
+- (dispatch_queue_t)globalQueue {
+	return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+#pragma mark - Device Configuration
+
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position {
+	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+	for (AVCaptureDevice *device in devices) {
+		if (device.position == position) {
+			return device;
+		}
+	}
+	return nil;
+}
+
+- (AVCaptureDevice *)activeCamera {
+	return self.activeVideoInput.device;
+}
+
+- (AVCaptureDevice *)inactiveCamera {
+	AVCaptureDevice *device = nil;
+	if (self.cameraCount > 1) {
+		if ([self activeCamera].position == AVCaptureDevicePositionBack) {
+			device = [self cameraWithPosition:AVCaptureDevicePositionFront];
+		}
+		else {
+			device = [self cameraWithPosition:AVCaptureDevicePositionBack];
+		}
+	}
+	return device;
+}
+
+- (BOOL)canSwitchCameras {
+	return self.cameraCount > 1;
+}
+
+- (NSUInteger)cameraCount {
+	return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
+}
+
+- (BOOL)switchCameras {
+	if (![self canSwitchCameras]) {
+		return NO;
+	}
+    
+	NSError *error;
+	AVCaptureDevice *videoDevice = [self inactiveCamera];
+
+	AVCaptureDeviceInput *videoInput =
+	    [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
+
+	if (videoInput) {
+		[self.captureSession beginConfiguration];
+
+		[self.captureSession removeInput:self.activeVideoInput];
+
+		if ([self.captureSession canAddInput:videoInput]) {
+			[self.captureSession addInput:videoInput];
+			self.activeVideoInput = videoInput;
+		}
+		else {
+			[self.captureSession addInput:self.activeVideoInput];
+		}
+
+		[self.captureSession commitConfiguration];
+	}
+	else {
+		[self.delegate deviceConfigurationFailedWithError:error];
+		return NO;
+	}
+    
+    
+    self.faceObjects = nil;
+    
+	return YES;
+}
+
+#pragma mark - Flash and Torch Modes
+
+- (BOOL)cameraHasFlash {
+	return [[self activeCamera] hasFlash];
+}
+
+- (AVCaptureFlashMode)flashMode {
+	return [[self activeCamera] flashMode];
+}
+
+- (void)setFlashMode:(AVCaptureFlashMode)flashMode {
+	AVCaptureDevice *device = [self activeCamera];
+
+	if (device.flashMode != flashMode &&
+	    [device isFlashModeSupported:flashMode]) {
+		NSError *error;
+		if ([device lockForConfiguration:&error]) {
+			device.flashMode = flashMode;
+			[device unlockForConfiguration];
+		}
+		else {
+			[self.delegate deviceConfigurationFailedWithError:error];
+		}
+	}
+}
+
+- (BOOL)cameraHasTorch {
+	return [[self activeCamera] hasTorch];
+}
+
+- (AVCaptureTorchMode)torchMode {
+	return [[self activeCamera] torchMode];
+}
+
+- (void)setTorchMode:(AVCaptureTorchMode)torchMode {
+	AVCaptureDevice *device = [self activeCamera];
+
+	if (device.torchMode != torchMode &&
+	    [device isTorchModeSupported:torchMode]) {
+		NSError *error;
+		if ([device lockForConfiguration:&error]) {
+			device.torchMode = torchMode;
+			[device unlockForConfiguration];
+		}
+		else {
+			[self.delegate deviceConfigurationFailedWithError:error];
+		}
+	}
+}
+
+#pragma mark - Focus Methods
+
+- (BOOL)cameraSupportsTapToFocus {
+	return [[self activeCamera] isFocusPointOfInterestSupported];
+}
+
+- (void)focusAtPoint:(CGPoint)point {
+	AVCaptureDevice *device = [self activeCamera];
+
+	if (device.isFocusPointOfInterestSupported &&
+	    [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+		NSError *error;
+		if ([device lockForConfiguration:&error]) {
+			device.focusPointOfInterest = point;
+            if(bNotLessThan5s) {
+                device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+            } else {
+                device.focusMode = AVCaptureFocusModeAutoFocus;
+            }
+			[device unlockForConfiguration];
+		}
+		else {
+			[self.delegate deviceConfigurationFailedWithError:error];
+		}
+	}
+}
+
+#pragma mark - Exposure Methods
+
+- (BOOL)cameraSupportsTapToExpose {
+	return [[self activeCamera] isExposurePointOfInterestSupported];
+}
+
+// Define KVO context pointer for observing 'adjustingExposure" device property.
+static const NSString *THCameraAdjustingExposureContext;
+
+- (void)exposeAtPoint:(CGPoint)point {
+	AVCaptureDevice *device = [self activeCamera];
+
+	AVCaptureExposureMode exposureMode =
+	    AVCaptureExposureModeContinuousAutoExposure;
+
+	if (device.isExposurePointOfInterestSupported &&
+	    [device isExposureModeSupported:exposureMode]) {
+		NSError *error;
+		if ([device lockForConfiguration:&error]) {
+			device.exposurePointOfInterest = point;
+			device.exposureMode = exposureMode;
+
+			if ([device isExposureModeSupported:AVCaptureExposureModeLocked]) {
+				[device addObserver:self
+				         forKeyPath:@"adjustingExposure"
+				            options:NSKeyValueObservingOptionNew
+				            context:&THCameraAdjustingExposureContext];
+			}
+
+			[device unlockForConfiguration];
+		}
+		else {
+			[self.delegate deviceConfigurationFailedWithError:error];
+		}
+	}
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+	if (context == &THCameraAdjustingExposureContext) {
+		AVCaptureDevice *device = (AVCaptureDevice *)object;
+
+		if (!device.isAdjustingExposure &&
+		    [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
+			[object removeObserver:self
+			            forKeyPath:@"adjustingExposure"
+			               context:&THCameraAdjustingExposureContext];
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+			    NSError *error;
+			    if ([device lockForConfiguration:&error]) {
+			        device.exposureMode = AVCaptureExposureModeLocked;
+			        [device unlockForConfiguration];
+				}
+			    else {
+			        [self.delegate deviceConfigurationFailedWithError:error];
+				}
+			});
+		}
+	}
+	else {
+		[super observeValueForKeyPath:keyPath
+		                     ofObject:object
+		                       change:change
+		                      context:context];
+	}
+}
+
+- (void)resetFocusAndExposureModes {
+	AVCaptureDevice *device = [self activeCamera];
+
+	AVCaptureExposureMode exposureMode =
+	    AVCaptureExposureModeContinuousAutoExposure;
+
+    AVCaptureFocusMode focusMode;
+    if(bNotLessThan5s) {
+        focusMode = AVCaptureFocusModeContinuousAutoFocus;
+    } else {
+        focusMode = AVCaptureFocusModeAutoFocus;
+    }
+
+	BOOL canResetFocus = [device isFocusPointOfInterestSupported] &&
+	    [device isFocusModeSupported:focusMode];
+
+	BOOL canResetExposure = [device isExposurePointOfInterestSupported] &&
+	    [device isExposureModeSupported:exposureMode];
+
+	CGPoint centerPoint = CGPointMake(0.5f, 0.5f);
+
+	NSError *error;
+	if ([device lockForConfiguration:&error]) {
+		if (canResetFocus) {
+			device.focusMode = focusMode;
+			device.focusPointOfInterest = centerPoint;
+		}
+
+		if (canResetExposure) {
+			device.exposureMode = exposureMode;
+			device.exposurePointOfInterest = centerPoint;
+		}
+
+		[device unlockForConfiguration];
+	}
+	else {
+		[self.delegate deviceConfigurationFailedWithError:error];
+	}
+}
+
+#pragma mark - Image Capture Methods
+
+
+
+- (void)captureStillImage {
+	AVCaptureConnection *connection =
+	    [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
+
+	if (connection.isVideoOrientationSupported) {
+		connection.videoOrientation = [self currentVideoOrientation];
+	}
+
+	id handler = ^(CMSampleBufferRef sampleBuffer, NSError *error) {
+		if (sampleBuffer != NULL) {
+			NSData *imageData =
+			    [AVCaptureStillImageOutput
+			 jpegStillImageNSDataRepresentation:sampleBuffer];
+
+			UIImage *image = [[UIImage alloc] initWithData:imageData];
+			[self writeImageToAssetsLibrary:image];
+		}
+		else {
+			NSLog(@"NULL sampleBuffer: %@", [error localizedDescription]);
+		}
+	};
+	// Capture still image
+	[self.imageOutput captureStillImageAsynchronouslyFromConnection:connection
+	                                              completionHandler:handler];
+}
+
+- (void)writeImageToAssetsLibrary:(UIImage *)image {
+	ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+
+	[library writeImageToSavedPhotosAlbum:image.CGImage
+	                          orientation:(NSInteger)image.imageOrientation
+	                      completionBlock: ^(NSURL *assetURL, NSError *error) {
+	    if (!error) {
+	        [self postThumbnailNotifification:image];
+		}
+	    else {
+	        id message = [error localizedDescription];
+	        NSLog(@"Error: %@", message);
+		}
+	}];
+}
+
+- (void)postThumbnailNotifification:(UIImage *)image {
+	dispatch_async(dispatch_get_main_queue(), ^{
+	    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+	    [nc postNotificationName:KSHThumbnailCreatedNotification object:image];
+	});
+}
+
+#pragma mark - Video Capture Methods
+
+- (BOOL)isRecording {
+	return self.isWriting;
+}
+
+- (void)startRecording {
+	dispatch_async([self globalQueue], ^{
+	    if (![self isRecording]) {
+	        self.videoSettings = [[self.videoDataOutput recommendedVideoSettingsForAssetWriterWithOutputFileType:AVFileTypeMPEG4] mutableCopy];
+            
+	        self.audioSettings = [self.audioDataOutput recommendedAudioSettingsForAssetWriterWithOutputFileType:AVFileTypeMPEG4];
+
+	        self.outputURL = [self uniqueURL];
+	        self.startTime = kCMTimeZero;
+	        NSError *error = nil;
+
+	        NSString *fileType = AVFileTypeMPEG4;
+	        self.assetWriter =
+	            [AVAssetWriter assetWriterWithURL:self.outputURL
+	                                     fileType:fileType
+	                                        error:&error];
+	        if (!self.assetWriter || error) {
+	            NSString *formatString = @"Could not create AVAssetWriter: %@";
+	            NSLog(@"%@", [NSString stringWithFormat:formatString, error]);
+
+	            return;
+			}
+
+	        self.assetWriterVideoInput =
+	            [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeVideo
+	                                           outputSettings:self.videoSettings];
+
+	        self.assetWriterVideoInput.expectsMediaDataInRealTime = YES;
+            
+            UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
+            self.assetWriterVideoInput.transform = IDTransformForDeviceOrientation(orientation);
+            
+            NSDictionary *attributes = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
+                                         (id)kCVPixelBufferWidthKey : self.videoSettings[AVVideoWidthKey],
+                                         (id)kCVPixelBufferHeightKey : self.videoSettings[AVVideoHeightKey],
+                                         (id)kCVPixelFormatOpenGLESCompatibility : (id)kCFBooleanTrue
+                                         };
+            self.assetWriterInputPixelBufferAdaptor = [[AVAssetWriterInputPixelBufferAdaptor alloc]
+             initWithAssetWriterInput:self.assetWriterVideoInput
+             sourcePixelBufferAttributes:attributes];
+
+	        if ([self.assetWriter canAddInput:self.assetWriterVideoInput]) {
+	            [self.assetWriter addInput:self.assetWriterVideoInput];
+			}
+	        else {
+	            NSLog(@"Unable to add video input.");
+
+	            return;
+			}
+
+	        self.assetWriterAudioInput =
+	            [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeAudio
+	                                           outputSettings:self.audioSettings];
+
+	        self.assetWriterAudioInput.expectsMediaDataInRealTime = YES;
+
+	        if ([self.assetWriter canAddInput:self.assetWriterAudioInput]) {
+	            [self.assetWriter addInput:self.assetWriterAudioInput];
+			}
+	        else {
+	            NSLog(@"Unable to add audio input.");
+			}
+
+	        self.isWriting = YES;
+	        self.firstSample = YES;
+		}
+	});
+}
+
+- (NSURL *)uniqueURL {
+	NSString *fileName = [[NSProcessInfo processInfo] globallyUniqueString];
+
+	NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+
+	NSString *movieDirectory = [NSString stringWithFormat:@"%@/Videos", documentsPath];
+
+	BOOL isDirectory;
+
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+
+	if (![fileManager fileExistsAtPath:movieDirectory isDirectory:&isDirectory]) {
+		[fileManager createDirectoryAtPath:movieDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+	}
+
+	NSString *filePath = nil;
+	do {
+		filePath = [NSString stringWithFormat:@"%@/%@.mp4", movieDirectory, fileName];
+	}
+	while ([[NSFileManager defaultManager] fileExistsAtPath:filePath]);
+
+	NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+
+	return fileURL;
+}
+
+- (void)stopRecording {
+	dispatch_async([self globalQueue], ^{
+	    self.isWriting = NO;
+	    self.startTime = kCMTimeZero;
+	    self.recordedDuration = 0;
+	    [self.assetWriter finishWritingWithCompletionHandler: ^{
+	        if (self.assetWriter.status == AVAssetWriterStatusCompleted) {
+	            dispatch_async(dispatch_get_main_queue(), ^{
+	                NSURL *fileURL = [self.assetWriter outputURL];
+	                [self writeVideoToAssetsLibrary:[fileURL copy]];
+                    NSLog(@"----finish recoding");
+				});
+	            self.outputURL = nil;
+			}
+	        else {
+	            NSLog(@"Failed to write movie: %@", self.assetWriter.error);
+			}
+		}];
+	});
+}
+
+#pragma mark - AVCaptureFileOutputRecordingDelegate
+
+- (void)                  captureOutput:(AVCaptureFileOutput *)captureOutput
+    didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL
+                        fromConnections:(NSArray *)connections
+                                  error:(NSError *)error {
+	if (error) {
+		[self.delegate mediaCaptureFailedWithError:error];
+	}
+	else {
+		[self writeVideoToAssetsLibrary:[self.outputURL copy]];
+	}
+	self.outputURL = nil;
+}
+
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+
+    if (bShouldStop == YES) {
+        return;
+    }
+    
+    if (lFrameCount ++ % 5 == 0)
+    {
+        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+        for (AVCaptureDevice *device in devices)
+        {
+            if ([device position] == AVCaptureDevicePositionBack)
+            {                                   //AVCaptureFocusModeAutoFocus
+                //AVCaptureFocusModeContinuousAutoFocus
+                if ([device isFocusModeSupported:AVCaptureFocusModeAutoFocus] )
+                {
+                    NSError *error = nil;
+                    if ([device lockForConfiguration:&error])
+                    {
+                        if(bNotLessThan5s) {
+                            device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+                        } else {
+                            device.focusMode = AVCaptureFocusModeAutoFocus;
+                        }
+                        
+                        if ([device respondsToSelector:@selector(isAutoFocusRangeRestrictionSupported)] && device.autoFocusRangeRestrictionSupported) {
+                            device.autoFocusRangeRestriction = AVCaptureAutoFocusRangeRestrictionNear;
+                        }
+                        [device unlockForConfiguration];
+                    }
+                }
+            }
+        }
+        lFrameCount = 1;
+        return;
+    }
+    
+    
+    __block CVPixelBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    if ([captureOutput isEqual:self.videoDataOutput]) {
+
+        if(bInProcessing == NO)
+        {
+            [self doRec:imageBuffer];
+//                IdInfo *idInfo = [self doRec:imageBuffer];
+//                if (idInfo !=nil && [idInfo isOK])
+//                {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        [self.recDelegate IDCardRecognited:idInfo];
+//                    });
+//
+//                }
+
+        }
+    }
+    
+
+    
+}
+
+- (CIImage*)makeFaceWithCIImage:(CIImage *)inputImage
+{
+    [self.filter setValue:inputImage forKey:kCIInputImageKey];
+    [self.filter setValue:@(MAX(inputImage.extent.size.width, inputImage.extent.size.height) / 60) forKey:kCIInputScaleKey];
+    CIImage *fullPixellatedImage = self.filter.outputImage;
+    
+    CIImage *maskImage;
+    for (AVMetadataFaceObject *faceObject in self.faceObjects) {
+        CGRect faceBounds = faceObject.bounds;
+        CGFloat centerX = inputImage.extent.size.width * (faceBounds.origin.x + faceBounds.size.width/2);
+        CGFloat centerY = inputImage.extent.size.height * (1 - faceBounds.origin.y - faceBounds.size.height /2);
+        
+        CGFloat radius = faceBounds.size.width * inputImage.extent.size.width/1.5;
+
+        CIFilter *radialGradient = [CIFilter filterWithName:@"CIRadialGradient" keysAndValues:@"inputRadius0",@(radius),@"inputRadius1",@(radius+1),@"inputColor0",[CIColor colorWithRed:0 green:1 blue:0 alpha:1],@"inputColor1",[CIColor colorWithRed:0 green:0 blue:0 alpha:0],kCIInputCenterKey,[CIVector vectorWithX:centerX Y:centerY], nil];
+        
+        CIImage *radialGradientOutputImage = [radialGradient.outputImage imageByCroppingToRect:inputImage.extent];
+        if (maskImage == nil) {
+            maskImage = radialGradientOutputImage;
+        }else{
+            maskImage = [[CIFilter filterWithName:@"CISourceOverCompositing" keysAndValues:kCIInputImageKey,radialGradientOutputImage,kCIInputBackgroundImageKey,maskImage,nil] outputImage];
+        }
+    }
+    
+    CIFilter *blendFilter = [CIFilter filterWithName:@"CIBlendWithMask"];
+    [blendFilter setValue:fullPixellatedImage forKey:kCIInputImageKey];
+    [blendFilter setValue:inputImage forKey:kCIInputBackgroundImageKey];
+    [blendFilter setValue:maskImage forKey:kCIInputMaskImageKey];
+    
+    return blendFilter.outputImage;
+}
+
+- (void)captureOutput:(AVCaptureOutput *)captureOutput
+didOutputMetadataObjects:(NSArray *)metadataObjects
+       fromConnection:(AVCaptureConnection *)connection {
+    self.faceObjects = metadataObjects;
+}
+
+- (void)writeVideoToAssetsLibrary:(NSURL *)videoURL {
+	ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+
+	if ([library videoAtPathIsCompatibleWithSavedPhotosAlbum:videoURL]) {
+		ALAssetsLibraryWriteVideoCompletionBlock completionBlock;
+
+		completionBlock = ^(NSURL *assetURL, NSError *error) {
+			if (error) {
+				[self.delegate assetLibraryWriteFailedWithError:error];
+			}
+			else {
+				[self generateThumbnailForVideoAtURL:videoURL];
+			}
+		};
+
+		[library writeVideoAtPathToSavedPhotosAlbum:videoURL
+		                            completionBlock:completionBlock];
+	}
+}
+
+- (void)generateThumbnailForVideoAtURL:(NSURL *)videoURL {
+	dispatch_async([self globalQueue], ^{
+	    AVAsset *asset = [AVAsset assetWithURL:videoURL];
+
+	    AVAssetImageGenerator *imageGenerator =
+	        [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
+	    imageGenerator.maximumSize = CGSizeMake(100.0f, 0.0f);
+	    imageGenerator.appliesPreferredTrackTransform = YES;
+
+	    CGImageRef imageRef = [imageGenerator copyCGImageAtTime:kCMTimeZero
+	                                                 actualTime:NULL
+	                                                      error:nil];
+	    UIImage *image = [UIImage imageWithCGImage:imageRef];
+	    CGImageRelease(imageRef);
+
+	    dispatch_async(dispatch_get_main_queue(), ^{
+	        [self postThumbnailNotifification:image];
+		});
+	});
+}
+
+#pragma mark - Recoding Destination URL
+
+- (AVCaptureVideoOrientation)currentVideoOrientation {
+	AVCaptureVideoOrientation videoOrientation;
+
+	UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+
+	switch (deviceOrientation) {
+		case UIDeviceOrientationLandscapeLeft:
+			videoOrientation = AVCaptureVideoOrientationLandscapeRight;
+			break;
+
+		case UIDeviceOrientationLandscapeRight:
+			videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
+			break;
+
+		case UIDeviceOrientationPortrait:
+			videoOrientation = AVCaptureVideoOrientationPortrait;
+			break;
+
+		case UIDeviceOrientationPortraitUpsideDown:
+			videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+			break;
+
+		default:
+			videoOrientation = AVCaptureVideoOrientationPortrait;
+			break;
+	}
+
+	return videoOrientation;
+}
+
+CGAffineTransform IDTransformForDeviceOrientation(UIDeviceOrientation orientation) {
+    CGAffineTransform result;
+    
+    switch (orientation) {
+            
+        case UIDeviceOrientationLandscapeRight:
+            result = CGAffineTransformMakeRotation(M_PI);
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            result = CGAffineTransformMakeRotation((M_PI_2 * 3));
+            break;
+            
+        case UIDeviceOrientationPortrait:
+        case UIDeviceOrientationFaceUp:
+        case UIDeviceOrientationFaceDown:
+            result = CGAffineTransformMakeRotation(M_PI_2);
+            break;
+            
+        default: // Default orientation of landscape left
+            result = CGAffineTransformIdentity;
+            break;
+    }
+    
+    return result;
+}
+
+#pragma mark do reco
+
+CGRect getIDGuideFrame( CGRect rect)
+{
+    float previewWidth = rect.size.height;
+    float previewHeight = rect.size.width;
+    
+    float cardh, cardw;
+    float lft, top;
+    
+    cardw = previewWidth*70/100;
+//    if(cardw < 720) cardw = 720;
+    if(previewWidth < cardw)
+        cardw = previewWidth;
+    
+    cardh = (int)(cardw / 0.63084f);
+    
+    lft = (previewWidth-cardw)/2;
+    top = (previewHeight-cardh)/2;
+    
+    CGRect r = CGRectMake(top+rect.origin.x, lft+rect.origin.y, cardh, cardw);
+    return r;
+}
+
+
+CGRect combinRectID(CGRect A, CGRect B)
+{
+    CGFloat t,b,l,r;
+    l = fminf(A.origin.x, B.origin.x);
+    r = fmaxf(A.size.width+A.origin.x, B.size.width+B.origin.x);
+    t = fminf(A.origin.y, B.origin.y);
+    b = fmaxf(A.size.height+A.origin.y, B.size.height+B.origin.y);
+    
+    return CGRectMake(l, t, r-l, b-t);
+}
+
+
+
+-(UIImage*)getSubImage:(CGRect)rect inImage:(UIImage*)img
+
+{
+    CGImageRef subImageRef = CGImageCreateWithImageInRect(img.CGImage, rect);
+    
+    CGRect smallBounds = CGRectMake(0, 0, CGImageGetWidth(subImageRef), CGImageGetHeight(subImageRef));
+    
+    UIGraphicsBeginImageContext(smallBounds.size);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextDrawImage(context, smallBounds, subImageRef);
+    
+    UIImage* smallImage = [UIImage imageWithCGImage:subImageRef];
+    CFRelease(subImageRef);
+    
+    UIGraphicsEndImageContext();
+    
+    return smallImage;
+    
+}
+
+-(UIImage*) getImageStream:(CVImageBufferRef)imageBuffer
+{
+    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:imageBuffer];
+    CIContext *temporaryContext = [CIContext contextWithOptions:nil];
+    CGImageRef videoImage = [temporaryContext
+                             createCGImage:ciImage
+                             fromRect:CGRectMake(0, 0,
+                                                 CVPixelBufferGetWidth(imageBuffer),
+                                                 CVPixelBufferGetHeight(imageBuffer))];
+    
+    UIImage *image = [[UIImage alloc] initWithCGImage:videoImage];
+    
+    CGImageRelease(videoImage);
+    return image;
+}
+
+
+
+-(IdInfo * )doRec:(CVImageBufferRef)imageBuffer
+{
+    @synchronized(self)
+    {
+        
+        if(bHasResult == YES)
+        {
+            return idInfo;
+        }
+        CVBufferRetain(imageBuffer);
+        bInProcessing = YES;
+
+        
+        if(CVPixelBufferLockBaseAddress(imageBuffer, 0) == kCVReturnSuccess)
+        {
+            size_t width= CVPixelBufferGetWidth(imageBuffer);
+            size_t height = CVPixelBufferGetHeight(imageBuffer);
+            
+            CVPlanarPixelBufferInfo_YCbCrBiPlanar *planar = CVPixelBufferGetBaseAddress(imageBuffer);
+            size_t offset = NSSwapBigIntToHost(planar->componentInfoY.offset);
+            size_t rowBytes = NSSwapBigIntToHost(planar->componentInfoY.rowBytes);
+            unsigned char* baseAddress = (unsigned char *)CVPixelBufferGetBaseAddress(imageBuffer);
+            unsigned char* pixelAddress = baseAddress + offset;
+            
+            size_t cbCrOffset = NSSwapBigIntToHost(planar->componentInfoCbCr.offset);
+            size_t cbCrPitch = NSSwapBigIntToHost(planar->componentInfoCbCr.rowBytes);
+            uint8_t *cbCrBuffer = baseAddress + cbCrOffset;
+            
+            
+            //CGRect effectRect = [self.recDelegate getEffectImageRect:CGSizeMake(width, height)];
+            //CGRect rect = getIDGuideFrame(effectRect);
+
+            
+            unsigned char pResult[4096];
+            int ret = EXCARDS_RecoIDCardData(pixelAddress, (int)width, (int)height, (int)rowBytes, (int)8, (char*)pResult, sizeof(pResult));
+            
+            NSLog(@"id ret=[%d]", ret);
+            if(ret > 0)
+            {
+                char ctype;
+                char content[256];
+                int xlen;
+                int i = 0;
+                idInfo = [[IdInfo alloc] init];
+                ctype = pResult[i++];
+                idInfo.type = ctype;
+                while(i < ret){
+                    ctype = pResult[i++];
+                    for(xlen = 0; i < ret; ++i){
+                        if(pResult[i] == ' ') { ++i; break; }
+                        content[xlen++] = pResult[i];
+                    }
+                    content[xlen] = 0;
+                    if(xlen){
+                        NSStringEncoding gbkEncoding =CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+                        if(ctype == 0x21) {
+                            idInfo.code = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                            NSString * birthdayYear  = [idInfo.code substringWithRange:NSMakeRange(6,4)];
+                            NSString * birthdayMonth = [idInfo.code substringWithRange:NSMakeRange(10,2)];
+                            NSString * birthdayDay   = [idInfo.code substringWithRange:NSMakeRange(12,2)];
+                            idInfo.birth = [[[[birthdayYear stringByAppendingString:@"-"] stringByAppendingString:birthdayMonth] stringByAppendingString:@"-"] stringByAppendingString:birthdayDay];
+                        }
+                        else if(ctype == 0x22)
+                            idInfo.name = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                        else if(ctype == 0x23)
+                            idInfo.gender = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                        else if(ctype == 0x24)
+                            idInfo.nation = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                        else if(ctype == 0x25)
+                            idInfo.address = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                        else if(ctype == 0x26)
+                            idInfo.issue = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                        else if(ctype == 0x27)
+                            idInfo.valid = [NSString stringWithCString:(char *)content encoding:gbkEncoding];
+                    }
+                }
+                
+                //进行比对
+                if ([self.recDelegate checkIDResult:idInfo]) {
+                    //NOTE________________________________________________________________
+                    //取得标准身份证图像，stdcardimage，客户根据需要和实际引用，提取标准身份证剪裁图像，
+                    //同时rects数组中保存了各个条目在标准图像中的位置，具体参考文档
+                    //NOTE________________________________________________________________
+                    if(1)
+                    {
+                        int nStatus = 0;
+                        EXIDCard idcard;
+                        unsigned char *pbImage = NULL;
+                        int nCardW, nCardH, nStride;
+                        int rects[32];
+                        
+                        idcard.imCard = NULL;
+                        //
+                        //get IDCardImage
+                        nStatus = EXCARDS_DecodeIDCardNV12Step2(pixelAddress, cbCrBuffer, width, height, pResult, sizeof(pResult), 1, &idcard);
+                        if(nStatus >= 0){
+                            bHasResult = YES;
+                            //convert image
+                            nCardW = idcard.imCard->width;
+                            nCardH = idcard.imCard->height;
+                            nStride= nCardW*4;
+                            pbImage = (unsigned char*)malloc(nCardH*nStride);
+                            if(pbImage){
+                                //
+                                //缓存图像数据
+                                Convert2AGBR(idcard.imCard, pbImage, nCardW, nCardH, nStride);
+                                //
+                                //取得各个块的坐标，
+                                EXIDCARDSaveRects(&idcard, rects);
+                                
+                                
+                                //获得CGImage
+                                CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+                                CGContextRef context = CGBitmapContextCreate(pbImage, nCardW, nCardH, 8, nStride, colorSpace,kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
+                                CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+                                CGImageRef imgRef = nil;
+                                
+                                
+                                if(GET_FULLIMAGE){
+                                    if(idcard.nType == 1 ) {
+                                        idInfo.frontFullImg = [UIImage imageWithCGImage:quartzImage];
+                                    } else {
+                                        idInfo.backFullImg = [UIImage imageWithCGImage:quartzImage];
+                                    }
+                                }
+                                
+                                if(idcard.nType == 1 ){
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtFace.nLft, idcard.rtFace.nTop, idcard.rtFace.nRgt - idcard.rtFace.nLft, idcard.rtFace.nBtm - idcard.rtFace.nTop));
+                                    idInfo.faceImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtName.nLft, idcard.rtName.nTop, idcard.rtName.nRgt - idcard.rtName.nLft, idcard.rtName.nBtm - idcard.rtName.nTop));
+                                    idInfo.nameImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtSex.nLft, idcard.rtSex.nTop, idcard.rtSex.nRgt - idcard.rtSex.nLft, idcard.rtSex.nBtm - idcard.rtSex.nTop));
+                                    idInfo.sexImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                    
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtCardID.nLft, idcard.rtCardID.nTop, idcard.rtCardID.nRgt - idcard.rtCardID.nLft, idcard.rtCardID.nBtm - idcard.rtCardID.nTop));
+                                    idInfo.noImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtAddress.nLft, idcard.rtAddress.nTop, idcard.rtAddress.nRgt - idcard.rtAddress.nLft, idcard.rtAddress.nBtm - idcard.rtAddress.nTop));
+                                    idInfo.addressImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                }else{
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtIssue.nLft, idcard.rtIssue.nTop, idcard.rtIssue.nRgt - idcard.rtIssue.nLft, idcard.rtIssue.nBtm - idcard.rtIssue.nTop));
+                                    idInfo.issueImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                    imgRef = CGImageCreateWithImageInRect(quartzImage,CGRectMake(idcard.rtValid.nLft, idcard.rtValid.nTop, idcard.rtValid.nRgt - idcard.rtValid.nLft, idcard.rtValid.nBtm - idcard.rtValid.nTop));
+                                    idInfo.validImg = [UIImage imageWithCGImage:imgRef];
+                                    CFRelease(imgRef);
+                                    
+                                }
+                                
+                                //请根据应用进行修改
+                                //保存图像,客户可以不保存而进行显示
+                                //[self writeImageToPhotosAlbum:quartzImage];
+                                
+                                CFRelease(quartzImage);
+                                CGContextRelease(context);
+                                CGColorSpaceRelease(colorSpace);
+                                
+                                free(pbImage);
+                            }
+                            if (idInfo !=nil && [idInfo isOK])
+                            {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [self.recDelegate IDCardRecognited:idInfo];
+                                });
+                                
+                            }
+                        }//释放图像
+                        EXCARDS_FreeIDCardST(&idcard);
+                    }
+                }
+                                
+            }
+            CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+        }
+        bInProcessing = NO;
+        CVBufferRelease(imageBuffer);
+    }
+    return idInfo;
+}
+
+unsigned char* rotateY2Landscape(unsigned char* srcAddress, size_t width, size_t height)
+{
+    unsigned char *destAddress = nil;
+    int k = 0, i, j, w, h;
+    int baseOffset, offset;
+    
+    w = (int)width;  h = (int)height;
+    baseOffset = (h-1)*(int)width;
+    
+    destAddress = (unsigned char*)malloc(sizeof(unsigned char)*h*w);
+    if(destAddress == nil) return nil;
+    
+    for (i = 0; i < width; i++) {
+        offset = baseOffset;
+        for (j = h-1; j >= 0; j--) {
+            destAddress[k] = srcAddress[offset+i];
+            k++; offset -= width;
+        }
+    }
+    NSLog(@"width:%zu, height:%zu, k:%d", width, height, k);
+    return destAddress;
+}
+
+unsigned char* rotateUV2Landscape(unsigned char* srcAddress, size_t width, size_t height)
+{
+    unsigned char *destAddress = nil;
+    int k = 0, i, j, w, h;
+    int baseOffset, offset;
+    
+    w = (int)width/2;  h = (int)height/2;
+    baseOffset = (h-1)*(int)width;
+    
+    destAddress = (unsigned char*)malloc(sizeof(unsigned char)*h*2*w);
+    if(destAddress == nil) return nil;
+    
+    for (i = 0; i < width; i+=2) {
+        offset = baseOffset;
+        for (j = h-1; j >= 0; j--) {
+            destAddress[k]   = srcAddress[offset+i];
+            destAddress[k+1] = srcAddress[offset+i+1];
+            k+=2; offset -= width;
+        }
+    }
+    NSLog(@"width:%zu, height:%zu, k:%d", width, height, k);
+    return destAddress;
+}
+
+int CardColorJudge(unsigned char *Y, unsigned char *UV, int width, int height)
+{
+    int i, j;
+    int step = width/2;
+    int top, btm, lft, rgt;
+    int iTht = 144;
+    int iCnt = 255;
+    int nNum = 0;
+    
+    top = height/16;
+    btm = height/2 - height/16;
+    lft = width/16;			  lft*=2;
+    rgt = width/2 - width/16; rgt*=2;
+    for(i = top; i < btm; ++i){
+        for(j = lft; j < rgt; ++j){
+            int val = UV[i*width + j]&0xFF;
+            if( val > iTht){ ++nNum; }
+        }
+    }
+    if(nNum > iCnt) return 1;
+    else return 0;
+}
+
+#pragma mark 判断手机型号
+- (BOOL)NotLessThan5s
+{
+    NSString *platform = [self getDeviceVersion];
+    if([[platform substringWithRange:NSMakeRange(0, 6)]isEqualToString:@"iPhone"]) {
+        int version = [[platform substringWithRange:NSMakeRange(6, 1)]intValue];
+        if (version >= 6) { //NOT less than iPhone5s
+            return true;
+        }
+    }
+    
+    return false;
+}
+#pragma mark 获得设备型号
+- (NSString*)getDeviceVersion
+{
+    size_t size;
+    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+    char *machine = (char*)malloc(size);
+    sysctlbyname("hw.machine", machine, &size, NULL, 0);
+    NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
+    free(machine);
+    return platform;
+}
+
+@end

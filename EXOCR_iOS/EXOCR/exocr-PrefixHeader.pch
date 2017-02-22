@@ -1,0 +1,18 @@
+//
+//  exocr-PrefixHeader.pch
+//  EXOCR
+//
+//  Created by mac on 16/3/28.
+//  Copyright © 2016年 z. All rights reserved.
+//
+
+#ifndef exocr_PrefixHeader_pch
+#define exocr_PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import <UIKit/UIKit.h>
+//添加混淆作用的头文件（这个文件名是脚本confuse.sh中定义的）
+#import "codeObfuscation.h"
+
+#endif /* exocr_PrefixHeader_pch */

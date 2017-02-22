@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LoginViewController">
+            <connections>
+                <outlet property="account" destination="4kB-NF-0ig" id="Ebx-eI-BCl"/>
+                <outlet property="loginBtn" destination="Q9g-j1-Op5" id="Ora-a3-BpU"/>
+                <outlet property="password" destination="tik-PZ-iOg" id="ekJ-Gm-yOV"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="4" translatesAutoresizingMaskIntoConstraints="NO" id="HOW-iJ-gYG">
+                    <rect key="frame" x="96" y="160" width="129" height="89"/>
+                    <animations/>
+                </imageView>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入密码" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="tik-PZ-iOg">
+                    <rect key="frame" x="50" y="344" width="220" height="45"/>
+                    <animations/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                </textField>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入账号" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4kB-NF-0ig">
+                    <rect key="frame" x="50" y="289" width="220" height="45"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="45" id="53r-AC-Q22"/>
+                    </constraints>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q9g-j1-Op5">
+                    <rect key="frame" x="50" y="419" width="220" height="45"/>
+                    <animations/>
+                    <state key="normal" title="登 录"/>
+                </button>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="1" translatesAutoresizingMaskIntoConstraints="NO" id="iei-vz-2C2">
+                    <rect key="frame" x="107" y="50" width="107" height="56"/>
+                    <animations/>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="宜昌市公安局伍家派出所" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BIa-5u-wi7">
+                    <rect key="frame" x="83" y="511" width="154" height="17"/>
+                    <animations/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="1" green="1" blue="1" alpha="0.29824746621621623" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" red="0.14901960784313725" green="0.15686274509803921" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="tik-PZ-iOg" firstAttribute="trailing" secondItem="4kB-NF-0ig" secondAttribute="trailing" id="0Tv-1s-58S"/>
+                <constraint firstItem="Q9g-j1-Op5" firstAttribute="height" secondItem="4kB-NF-0ig" secondAttribute="height" id="22n-Kc-n32"/>
+                <constraint firstItem="Q9g-j1-Op5" firstAttribute="top" secondItem="tik-PZ-iOg" secondAttribute="bottom" constant="30" id="4G2-FJ-Egq"/>
+                <constraint firstItem="HOW-iJ-gYG" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="DSi-YF-3fd"/>
+                <constraint firstItem="iei-vz-2C2" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="50" id="JED-Jh-x7e"/>
+                <constraint firstAttribute="trailing" secondItem="4kB-NF-0ig" secondAttribute="trailing" constant="50" id="JZt-22-cQI"/>
+                <constraint firstItem="Q9g-j1-Op5" firstAttribute="leading" secondItem="4kB-NF-0ig" secondAttribute="leading" id="OAo-vb-QEP"/>
+                <constraint firstItem="4kB-NF-0ig" firstAttribute="top" secondItem="HOW-iJ-gYG" secondAttribute="bottom" constant="40" id="S59-4p-uJj"/>
+                <constraint firstItem="tik-PZ-iOg" firstAttribute="height" secondItem="4kB-NF-0ig" secondAttribute="height" id="UNW-gm-Q27"/>
+                <constraint firstItem="tik-PZ-iOg" firstAttribute="top" secondItem="4kB-NF-0ig" secondAttribute="bottom" constant="10" id="VIi-Yp-Iqb"/>
+                <constraint firstItem="HOW-iJ-gYG" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" constant="-80" id="WBm-ev-Wuq"/>
+                <constraint firstItem="tik-PZ-iOg" firstAttribute="leading" secondItem="4kB-NF-0ig" secondAttribute="leading" id="WiY-7T-JKc"/>
+                <constraint firstItem="BIa-5u-wi7" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="aS2-jG-pQe"/>
+                <constraint firstItem="iei-vz-2C2" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="cPE-0g-jCd"/>
+                <constraint firstItem="Q9g-j1-Op5" firstAttribute="trailing" secondItem="4kB-NF-0ig" secondAttribute="trailing" id="e9o-hv-ffS"/>
+                <constraint firstItem="4kB-NF-0ig" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="50" id="fzN-50-pVt"/>
+                <constraint firstAttribute="bottom" secondItem="BIa-5u-wi7" secondAttribute="bottom" constant="40" id="hAV-Pd-wT6"/>
+            </constraints>
+            <point key="canvasLocation" x="546" y="497"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="1" width="107" height="56"/>
+        <image name="4" width="129" height="89"/>
+    </resources>
+</document>

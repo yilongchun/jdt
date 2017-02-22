@@ -1,0 +1,23 @@
+//
+//  jdt.pch
+//  jdt
+//
+//  Created by Stephen Chin on 17/2/22.
+//  Copyright © 2017年 Stephen Chin. All rights reserved.
+//
+
+#ifndef jdt_pch
+#define jdt_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* jdt_pch */
+
+#ifdef __OBJC__
+    #import "ACMacros.h"
+    #import "UIViewController+HUD.h"
+
+#endif
+
+#define DEFAULT_FONT SYSTEMFONT(17)

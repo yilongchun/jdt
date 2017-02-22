@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "__41-[IDCardViewController idCardRecognited:]_block_invoke:IDCardViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "idInfo.faceImg.size.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
