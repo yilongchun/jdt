@@ -8,7 +8,16 @@
 
 #import "PersonViewController.h"
 
-@interface PersonViewController ()
+
+#import "DictManager.h"
+
+#import "IDCardViewController.h"
+#import "IDCardResultViewController.h"
+
+#import "DRCardViewController.h"
+#import "DRCardResultViewController.h"
+
+@interface PersonViewController ()<IDRstEditDelegate, DRCamCotrllerDelegate>
 
 @end
 
@@ -19,6 +28,8 @@
     // Do any additional setup after loading the view from its nib.
     
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    [DictManager InitDict];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -36,4 +47,39 @@
 }
 */
 
+- (IBAction)action1:(id)sender {
+    IDCardResultViewController *IDRstVc = [[IDCardResultViewController alloc] init];
+    IDRstVc.delegate = self;
+    [self.navigationController pushViewController:IDRstVc animated:YES];
+}
+-(void)returnIDResult:(IdInfo* ) idInfo from:(id)sender
+{
+    
+}
+
+- (IBAction)action2:(id)sender {
+    DRCardViewController * controller = [[DRCardViewController alloc] initWithNibName:nil bundle:nil];
+    controller.DRCamDelegate = self;
+    [self.navigationController pushViewController:controller animated:YES];
+}
+-(void)didEndRecDRWithResult:(DrCardInfo* ) drInfo from:(id)sender{
+    __weak UIViewController * vc = (UIViewController*)sender;
+    
+    if (![DrCardInfo getNoShowDRResultView]) {
+        if(drInfo != nil)
+        {
+            DRCardResultViewController * DRRstVc = [[DRCardResultViewController alloc] init];
+            DRRstVc.DRInfo = drInfo;
+            [vc.navigationController pushViewController:DRRstVc animated:NO];
+            NSLog(@"push drCardResultViewController");
+        }
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+
+-(void)dealloc {
+    [DictManager FinishDict];
+}
 @end

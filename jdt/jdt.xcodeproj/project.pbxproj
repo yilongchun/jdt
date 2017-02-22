@@ -12,7 +12,6 @@
 		44F9BEA21E5D3EA50070F7B8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BEA11E5D3EA50070F7B8 /* ViewController.m */; };
 		44F9BEA51E5D3EA50070F7B8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BEA31E5D3EA50070F7B8 /* Main.storyboard */; };
 		44F9BEA71E5D3EA50070F7B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BEA61E5D3EA50070F7B8 /* Assets.xcassets */; };
-		44F9BEAA1E5D3EA50070F7B8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BEA81E5D3EA50070F7B8 /* LaunchScreen.storyboard */; };
 		44F9BEB61E5D51E60070F7B8 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BEB41E5D51E60070F7B8 /* LoginViewController.m */; };
 		44F9BEB71E5D51E60070F7B8 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BEB51E5D51E60070F7B8 /* LoginViewController.xib */; };
 		44F9BEBB1E5D58F20070F7B8 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BEBA1E5D58F20070F7B8 /* UIImage+Color.m */; };
@@ -61,6 +60,31 @@
 		44F9BF5D1E5D6DA70070F7B8 /* UnitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BF5B1E5D6DA70070F7B8 /* UnitViewController.m */; };
 		44F9BF5E1E5D6DA70070F7B8 /* UnitViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BF5C1E5D6DA70070F7B8 /* UnitViewController.xib */; };
 		44F9BF611E5D6E670070F7B8 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BF601E5D6E670070F7B8 /* MainViewController.m */; };
+		44F9C0101E5D76050070F7B8 /* DictManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFDF1E5D76050070F7B8 /* DictManager.m */; };
+		44F9C0111E5D76050070F7B8 /* libexidcardios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 44F9BFE41E5D76050070F7B8 /* libexidcardios.a */; };
+		44F9C0121E5D76060070F7B8 /* zocr0.lib in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BFE51E5D76050070F7B8 /* zocr0.lib */; };
+		44F9C0131E5D76060070F7B8 /* DRCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFE91E5D76050070F7B8 /* DRCameraController.m */; };
+		44F9C0141E5D76060070F7B8 /* DRContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFEB1E5D76050070F7B8 /* DRContextManager.m */; };
+		44F9C0151E5D76060070F7B8 /* DRFrameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFED1E5D76050070F7B8 /* DRFrameView.m */; };
+		44F9C0161E5D76060070F7B8 /* DrCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFEF1E5D76050070F7B8 /* DrCardInfo.m */; };
+		44F9C0171E5D76060070F7B8 /* DRCardResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFF11E5D76050070F7B8 /* DRCardResultViewController.m */; };
+		44F9C0181E5D76060070F7B8 /* DRCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFF31E5D76050070F7B8 /* DRCardViewController.m */; };
+		44F9C0191E5D76060070F7B8 /* DRCardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BFF41E5D76050070F7B8 /* DRCardViewController.xib */; };
+		44F9C01A1E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BFF51E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */; };
+		44F9C01B1E5D76060070F7B8 /* exocr-flash_camera_btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BFF61E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */; };
+		44F9C01C1E5D76060070F7B8 /* exocr-ydbs.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9BFF71E5D76050070F7B8 /* exocr-ydbs.png */; };
+		44F9C01D1E5D76060070F7B8 /* DRPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFFA1E5D76050070F7B8 /* DRPhoto.m */; };
+		44F9C01E1E5D76060070F7B8 /* IDCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BFFE1E5D76050070F7B8 /* IDCameraController.m */; };
+		44F9C01F1E5D76060070F7B8 /* IDContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C0001E5D76050070F7B8 /* IDContextManager.m */; };
+		44F9C0201E5D76060070F7B8 /* IDFrameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C0021E5D76050070F7B8 /* IDFrameView.m */; };
+		44F9C0211E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9C0031E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */; };
+		44F9C0221E5D76060070F7B8 /* exocr-flash_camera_btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9C0041E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */; };
+		44F9C0231E5D76060070F7B8 /* exocr-ydbs.png in Resources */ = {isa = PBXBuildFile; fileRef = 44F9C0051E5D76050070F7B8 /* exocr-ydbs.png */; };
+		44F9C0241E5D76060070F7B8 /* IDCardResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C0071E5D76050070F7B8 /* IDCardResultViewController.m */; };
+		44F9C0251E5D76060070F7B8 /* IDCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C0091E5D76050070F7B8 /* IDCardViewController.m */; };
+		44F9C0261E5D76060070F7B8 /* IDCardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F9C00A1E5D76050070F7B8 /* IDCardViewController.xib */; };
+		44F9C0271E5D76060070F7B8 /* IdInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C00C1E5D76050070F7B8 /* IdInfo.m */; };
+		44F9C0281E5D76060070F7B8 /* IDPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9C00F1E5D76050070F7B8 /* IDPhoto.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,7 +96,6 @@
 		44F9BEA11E5D3EA50070F7B8 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		44F9BEA41E5D3EA50070F7B8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		44F9BEA61E5D3EA50070F7B8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		44F9BEA91E5D3EA50070F7B8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		44F9BEAB1E5D3EA50070F7B8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44F9BEB11E5D50E30070F7B8 /* ACMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACMacros.h; sourceTree = "<group>"; };
 		44F9BEB21E5D513B0070F7B8 /* jdt.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jdt.pch; sourceTree = "<group>"; };
@@ -171,6 +194,51 @@
 		44F9BF5C1E5D6DA70070F7B8 /* UnitViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UnitViewController.xib; sourceTree = "<group>"; };
 		44F9BF5F1E5D6E670070F7B8 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		44F9BF601E5D6E670070F7B8 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		44F9BFDD1E5D76050070F7B8 /* commondef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = commondef.h; sourceTree = "<group>"; };
+		44F9BFDE1E5D76050070F7B8 /* DictManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DictManager.h; sourceTree = "<group>"; };
+		44F9BFDF1E5D76050070F7B8 /* DictManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictManager.m; sourceTree = "<group>"; };
+		44F9BFE01E5D76050070F7B8 /* excards.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = excards.h; sourceTree = "<group>"; };
+		44F9BFE11E5D76050070F7B8 /* exdrcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exdrcard.h; sourceTree = "<group>"; };
+		44F9BFE21E5D76050070F7B8 /* exidcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exidcard.h; sourceTree = "<group>"; };
+		44F9BFE31E5D76050070F7B8 /* grbitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grbitmap.h; sourceTree = "<group>"; };
+		44F9BFE41E5D76050070F7B8 /* libexidcardios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libexidcardios.a; sourceTree = "<group>"; };
+		44F9BFE51E5D76050070F7B8 /* zocr0.lib */ = {isa = PBXFileReference; lastKnownFileType = file; path = zocr0.lib; sourceTree = "<group>"; };
+		44F9BFE81E5D76050070F7B8 /* DRCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRCameraController.h; sourceTree = "<group>"; };
+		44F9BFE91E5D76050070F7B8 /* DRCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRCameraController.m; sourceTree = "<group>"; };
+		44F9BFEA1E5D76050070F7B8 /* DRContextManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRContextManager.h; sourceTree = "<group>"; };
+		44F9BFEB1E5D76050070F7B8 /* DRContextManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRContextManager.m; sourceTree = "<group>"; };
+		44F9BFEC1E5D76050070F7B8 /* DRFrameView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRFrameView.h; sourceTree = "<group>"; };
+		44F9BFED1E5D76050070F7B8 /* DRFrameView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRFrameView.m; sourceTree = "<group>"; };
+		44F9BFEE1E5D76050070F7B8 /* DrCardInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrCardInfo.h; sourceTree = "<group>"; };
+		44F9BFEF1E5D76050070F7B8 /* DrCardInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrCardInfo.m; sourceTree = "<group>"; };
+		44F9BFF01E5D76050070F7B8 /* DRCardResultViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRCardResultViewController.h; sourceTree = "<group>"; };
+		44F9BFF11E5D76050070F7B8 /* DRCardResultViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRCardResultViewController.m; sourceTree = "<group>"; };
+		44F9BFF21E5D76050070F7B8 /* DRCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRCardViewController.h; sourceTree = "<group>"; };
+		44F9BFF31E5D76050070F7B8 /* DRCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRCardViewController.m; sourceTree = "<group>"; };
+		44F9BFF41E5D76050070F7B8 /* DRCardViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DRCardViewController.xib; sourceTree = "<group>"; };
+		44F9BFF51E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-back_camera_btn@2x.png"; sourceTree = "<group>"; };
+		44F9BFF61E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-flash_camera_btn@2x.png"; sourceTree = "<group>"; };
+		44F9BFF71E5D76050070F7B8 /* exocr-ydbs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-ydbs.png"; sourceTree = "<group>"; };
+		44F9BFF91E5D76050070F7B8 /* DRPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRPhoto.h; sourceTree = "<group>"; };
+		44F9BFFA1E5D76050070F7B8 /* DRPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRPhoto.m; sourceTree = "<group>"; };
+		44F9BFFD1E5D76050070F7B8 /* IDCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDCameraController.h; sourceTree = "<group>"; };
+		44F9BFFE1E5D76050070F7B8 /* IDCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDCameraController.m; sourceTree = "<group>"; };
+		44F9BFFF1E5D76050070F7B8 /* IDContextManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDContextManager.h; sourceTree = "<group>"; };
+		44F9C0001E5D76050070F7B8 /* IDContextManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDContextManager.m; sourceTree = "<group>"; };
+		44F9C0011E5D76050070F7B8 /* IDFrameView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDFrameView.h; sourceTree = "<group>"; };
+		44F9C0021E5D76050070F7B8 /* IDFrameView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDFrameView.m; sourceTree = "<group>"; };
+		44F9C0031E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-back_camera_btn@2x.png"; sourceTree = "<group>"; };
+		44F9C0041E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-flash_camera_btn@2x.png"; sourceTree = "<group>"; };
+		44F9C0051E5D76050070F7B8 /* exocr-ydbs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "exocr-ydbs.png"; sourceTree = "<group>"; };
+		44F9C0061E5D76050070F7B8 /* IDCardResultViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDCardResultViewController.h; sourceTree = "<group>"; };
+		44F9C0071E5D76050070F7B8 /* IDCardResultViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDCardResultViewController.m; sourceTree = "<group>"; };
+		44F9C0081E5D76050070F7B8 /* IDCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDCardViewController.h; sourceTree = "<group>"; };
+		44F9C0091E5D76050070F7B8 /* IDCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDCardViewController.m; sourceTree = "<group>"; };
+		44F9C00A1E5D76050070F7B8 /* IDCardViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IDCardViewController.xib; sourceTree = "<group>"; };
+		44F9C00B1E5D76050070F7B8 /* IdInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IdInfo.h; sourceTree = "<group>"; };
+		44F9C00C1E5D76050070F7B8 /* IdInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IdInfo.m; sourceTree = "<group>"; };
+		44F9C00E1E5D76050070F7B8 /* IDPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDPhoto.h; sourceTree = "<group>"; };
+		44F9C00F1E5D76050070F7B8 /* IDPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDPhoto.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +246,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44F9C0111E5D76050070F7B8 /* libexidcardios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,7 +289,6 @@
 				44F9BF5C1E5D6DA70070F7B8 /* UnitViewController.xib */,
 				44F9BEA31E5D3EA50070F7B8 /* Main.storyboard */,
 				44F9BEA61E5D3EA50070F7B8 /* Assets.xcassets */,
-				44F9BEA81E5D3EA50070F7B8 /* LaunchScreen.storyboard */,
 				44F9BEAB1E5D3EA50070F7B8 /* Info.plist */,
 				44F9BEBC1E5D5E050070F7B8 /* Lib */,
 				44F9BEB81E5D58E40070F7B8 /* Category */,
@@ -252,6 +320,9 @@
 		44F9BEBC1E5D5E050070F7B8 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				44F9BFDC1E5D76050070F7B8 /* cardcore */,
+				44F9BFE61E5D76050070F7B8 /* drcard */,
+				44F9BFFB1E5D76050070F7B8 /* idcard */,
 				44F9BF411E5D6D300070F7B8 /* JZNavigationExtension */,
 				44F9BF2B1E5D67E70070F7B8 /* JYSlideSegmentController */,
 				44F9BF0E1E5D64DE0070F7B8 /* AFNetworking */,
@@ -433,6 +504,104 @@
 			path = Private;
 			sourceTree = "<group>";
 		};
+		44F9BFDC1E5D76050070F7B8 /* cardcore */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFDD1E5D76050070F7B8 /* commondef.h */,
+				44F9BFDE1E5D76050070F7B8 /* DictManager.h */,
+				44F9BFDF1E5D76050070F7B8 /* DictManager.m */,
+				44F9BFE01E5D76050070F7B8 /* excards.h */,
+				44F9BFE11E5D76050070F7B8 /* exdrcard.h */,
+				44F9BFE21E5D76050070F7B8 /* exidcard.h */,
+				44F9BFE31E5D76050070F7B8 /* grbitmap.h */,
+				44F9BFE41E5D76050070F7B8 /* libexidcardios.a */,
+				44F9BFE51E5D76050070F7B8 /* zocr0.lib */,
+			);
+			path = cardcore;
+			sourceTree = "<group>";
+		};
+		44F9BFE61E5D76050070F7B8 /* drcard */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFE71E5D76050070F7B8 /* camera */,
+				44F9BFEE1E5D76050070F7B8 /* DrCardInfo.h */,
+				44F9BFEF1E5D76050070F7B8 /* DrCardInfo.m */,
+				44F9BFF01E5D76050070F7B8 /* DRCardResultViewController.h */,
+				44F9BFF11E5D76050070F7B8 /* DRCardResultViewController.m */,
+				44F9BFF21E5D76050070F7B8 /* DRCardViewController.h */,
+				44F9BFF31E5D76050070F7B8 /* DRCardViewController.m */,
+				44F9BFF41E5D76050070F7B8 /* DRCardViewController.xib */,
+				44F9BFF51E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */,
+				44F9BFF61E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */,
+				44F9BFF71E5D76050070F7B8 /* exocr-ydbs.png */,
+				44F9BFF81E5D76050070F7B8 /* photo */,
+			);
+			path = drcard;
+			sourceTree = "<group>";
+		};
+		44F9BFE71E5D76050070F7B8 /* camera */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFE81E5D76050070F7B8 /* DRCameraController.h */,
+				44F9BFE91E5D76050070F7B8 /* DRCameraController.m */,
+				44F9BFEA1E5D76050070F7B8 /* DRContextManager.h */,
+				44F9BFEB1E5D76050070F7B8 /* DRContextManager.m */,
+				44F9BFEC1E5D76050070F7B8 /* DRFrameView.h */,
+				44F9BFED1E5D76050070F7B8 /* DRFrameView.m */,
+			);
+			path = camera;
+			sourceTree = "<group>";
+		};
+		44F9BFF81E5D76050070F7B8 /* photo */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFF91E5D76050070F7B8 /* DRPhoto.h */,
+				44F9BFFA1E5D76050070F7B8 /* DRPhoto.m */,
+			);
+			path = photo;
+			sourceTree = "<group>";
+		};
+		44F9BFFB1E5D76050070F7B8 /* idcard */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFFC1E5D76050070F7B8 /* camera */,
+				44F9C0031E5D76050070F7B8 /* exocr-back_camera_btn@2x.png */,
+				44F9C0041E5D76050070F7B8 /* exocr-flash_camera_btn@2x.png */,
+				44F9C0051E5D76050070F7B8 /* exocr-ydbs.png */,
+				44F9C0061E5D76050070F7B8 /* IDCardResultViewController.h */,
+				44F9C0071E5D76050070F7B8 /* IDCardResultViewController.m */,
+				44F9C0081E5D76050070F7B8 /* IDCardViewController.h */,
+				44F9C0091E5D76050070F7B8 /* IDCardViewController.m */,
+				44F9C00A1E5D76050070F7B8 /* IDCardViewController.xib */,
+				44F9C00B1E5D76050070F7B8 /* IdInfo.h */,
+				44F9C00C1E5D76050070F7B8 /* IdInfo.m */,
+				44F9C00D1E5D76050070F7B8 /* photo */,
+			);
+			path = idcard;
+			sourceTree = "<group>";
+		};
+		44F9BFFC1E5D76050070F7B8 /* camera */ = {
+			isa = PBXGroup;
+			children = (
+				44F9BFFD1E5D76050070F7B8 /* IDCameraController.h */,
+				44F9BFFE1E5D76050070F7B8 /* IDCameraController.m */,
+				44F9BFFF1E5D76050070F7B8 /* IDContextManager.h */,
+				44F9C0001E5D76050070F7B8 /* IDContextManager.m */,
+				44F9C0011E5D76050070F7B8 /* IDFrameView.h */,
+				44F9C0021E5D76050070F7B8 /* IDFrameView.m */,
+			);
+			path = camera;
+			sourceTree = "<group>";
+		};
+		44F9C00D1E5D76050070F7B8 /* photo */ = {
+			isa = PBXGroup;
+			children = (
+				44F9C00E1E5D76050070F7B8 /* IDPhoto.h */,
+				44F9C00F1E5D76050070F7B8 /* IDPhoto.m */,
+			);
+			path = photo;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -491,13 +660,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				44F9BEF01E5D5E100070F7B8 /* IQKeyboardManager.bundle in Resources */,
+				44F9C0221E5D76060070F7B8 /* exocr-flash_camera_btn@2x.png in Resources */,
 				44F9BEB71E5D51E60070F7B8 /* LoginViewController.xib in Resources */,
 				44F9BF5E1E5D6DA70070F7B8 /* UnitViewController.xib in Resources */,
+				44F9C01B1E5D76060070F7B8 /* exocr-flash_camera_btn@2x.png in Resources */,
 				44F9BF401E5D68FE0070F7B8 /* PersonViewController.xib in Resources */,
+				44F9C0191E5D76060070F7B8 /* DRCardViewController.xib in Resources */,
+				44F9C0261E5D76060070F7B8 /* IDCardViewController.xib in Resources */,
 				44F9BEFD1E5D64180070F7B8 /* btnCheck.png in Resources */,
-				44F9BEAA1E5D3EA50070F7B8 /* LaunchScreen.storyboard in Resources */,
+				44F9C0211E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */,
+				44F9C01A1E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */,
+				44F9C01C1E5D76060070F7B8 /* exocr-ydbs.png in Resources */,
+				44F9C0231E5D76060070F7B8 /* exocr-ydbs.png in Resources */,
 				44F9BEA71E5D3EA50070F7B8 /* Assets.xcassets in Resources */,
 				44F9BEFE1E5D64180070F7B8 /* btnCheck@2x.png in Resources */,
+				44F9C0121E5D76060070F7B8 /* zocr0.lib in Resources */,
 				44F9BEA51E5D3EA50070F7B8 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -512,8 +689,12 @@
 				44F9BF221E5D64DE0070F7B8 /* AFHTTPRequestOperation.m in Sources */,
 				44F9BF591E5D6D300070F7B8 /* UIViewController+JZExtension.m in Sources */,
 				44F9BEEC1E5D5E100070F7B8 /* IQPreviousNextView.m in Sources */,
+				44F9C0131E5D76060070F7B8 /* DRCameraController.m in Sources */,
 				44F9BF0D1E5D64380070F7B8 /* UIViewController+Visible.m in Sources */,
+				44F9C01F1E5D76060070F7B8 /* IDContextManager.m in Sources */,
+				44F9C0151E5D76060070F7B8 /* DRFrameView.m in Sources */,
 				44F9BF541E5D6D300070F7B8 /* _JZValue.m in Sources */,
+				44F9C0101E5D76050070F7B8 /* DictManager.m in Sources */,
 				44F9BEE81E5D5E100070F7B8 /* IQKeyboardManager.m in Sources */,
 				44F9BEE21E5D5E100070F7B8 /* IQNSArray+Sort.m in Sources */,
 				44F9BF241E5D64DE0070F7B8 /* AFHTTPSessionManager.m in Sources */,
@@ -521,11 +702,16 @@
 				44F9BEB61E5D51E60070F7B8 /* LoginViewController.m in Sources */,
 				44F9BF531E5D6D300070F7B8 /* _JZNavigationInteractiveTransition.m in Sources */,
 				44F9BEE31E5D5E100070F7B8 /* IQUIScrollView+Additions.m in Sources */,
+				44F9C0241E5D76060070F7B8 /* IDCardResultViewController.m in Sources */,
+				44F9C01D1E5D76060070F7B8 /* DRPhoto.m in Sources */,
 				44F9BF581E5D6D300070F7B8 /* UINavigationController+JZExtension.m in Sources */,
+				44F9C0281E5D76060070F7B8 /* IDPhoto.m in Sources */,
 				44F9BF611E5D6E670070F7B8 /* MainViewController.m in Sources */,
 				44F9BEFF1E5D64180070F7B8 /* HUD.m in Sources */,
+				44F9C0251E5D76060070F7B8 /* IDCardViewController.m in Sources */,
 				44F9BF571E5D6D300070F7B8 /* UIToolbar+JZExtension.m in Sources */,
 				44F9BF2A1E5D64DE0070F7B8 /* AFURLSessionManager.m in Sources */,
+				44F9C0141E5D76060070F7B8 /* DRContextManager.m in Sources */,
 				44F9BEEE1E5D5E100070F7B8 /* IQToolbar.m in Sources */,
 				44F9BF2E1E5D67E70070F7B8 /* JYSlideSegmentController.m in Sources */,
 				44F9BF261E5D64DE0070F7B8 /* AFSecurityPolicy.m in Sources */,
@@ -538,19 +724,25 @@
 				44F9BF271E5D64DE0070F7B8 /* AFURLConnectionOperation.m in Sources */,
 				44F9BE9F1E5D3EA50070F7B8 /* AppDelegate.m in Sources */,
 				44F9BF281E5D64DE0070F7B8 /* AFURLRequestSerialization.m in Sources */,
+				44F9C0201E5D76060070F7B8 /* IDFrameView.m in Sources */,
 				44F9BF551E5D6D300070F7B8 /* NSNumber+JZExtension.m in Sources */,
 				44F9BEE61E5D5E100070F7B8 /* IQUIViewController+Additions.m in Sources */,
 				44F9BEED1E5D5E100070F7B8 /* IQTitleBarButtonItem.m in Sources */,
 				44F9BF001E5D64180070F7B8 /* MBProgressHUD.m in Sources */,
 				44F9BF231E5D64DE0070F7B8 /* AFHTTPRequestOperationManager.m in Sources */,
 				44F9BEE41E5D5E100070F7B8 /* IQUITextFieldView+Additions.m in Sources */,
+				44F9C0161E5D76060070F7B8 /* DrCardInfo.m in Sources */,
+				44F9C0181E5D76060070F7B8 /* DRCardViewController.m in Sources */,
 				44F9BF5D1E5D6DA70070F7B8 /* UnitViewController.m in Sources */,
 				44F9BEEB1E5D5E100070F7B8 /* IQBarButtonItem.m in Sources */,
 				44F9BF251E5D64DE0070F7B8 /* AFNetworkReachabilityManager.m in Sources */,
 				44F9BF0B1E5D64380070F7B8 /* UIViewController+HUD.m in Sources */,
+				44F9C0271E5D76060070F7B8 /* IdInfo.m in Sources */,
 				44F9BEE51E5D5E100070F7B8 /* IQUIView+Hierarchy.m in Sources */,
 				44F9BF0C1E5D64380070F7B8 /* UIViewController+RecursiveDescription.m in Sources */,
 				44F9BF0A1E5D64380070F7B8 /* UIViewController+DismissKeyboard.m in Sources */,
+				44F9C01E1E5D76060070F7B8 /* IDCameraController.m in Sources */,
+				44F9C0171E5D76060070F7B8 /* DRCardResultViewController.m in Sources */,
 				44F9BE9C1E5D3EA50070F7B8 /* main.m in Sources */,
 				44F9BEEF1E5D5E100070F7B8 /* IQUIView+IQKeyboardToolbar.m in Sources */,
 				44F9BEEA1E5D5E100070F7B8 /* IQTextView.m in Sources */,
@@ -566,14 +758,6 @@
 				44F9BEA41E5D3EA50070F7B8 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		44F9BEA81E5D3EA50070F7B8 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				44F9BEA91E5D3EA50070F7B8 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -663,10 +847,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREFIX_HEADER = /Users/Chin/Project/jdt/jdt/jdt/jdt.pch;
 				INFOPLIST_FILE = jdt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = yc.jdt;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/jdt/Lib/cardcore",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ycjzz.jdt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -675,10 +864,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREFIX_HEADER = /Users/Chin/Project/jdt/jdt/jdt/jdt.pch;
 				INFOPLIST_FILE = jdt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = yc.jdt;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/jdt/Lib/cardcore",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ycjzz.jdt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

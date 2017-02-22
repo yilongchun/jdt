@@ -17,7 +17,13 @@
 #ifdef __OBJC__
     #import "ACMacros.h"
     #import "UIViewController+HUD.h"
+    #import "AFNetworking.h"
 
 #endif
 
+#define kHost @"http://115.29.103.36:88/"
+
+#define kLogin @"courier/login"
+
+#define LOGINED_USER @"loginedUser"
 #define DEFAULT_FONT SYSTEMFONT(17)
