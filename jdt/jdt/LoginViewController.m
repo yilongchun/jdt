@@ -9,6 +9,8 @@
 #import "LoginViewController.h"
 #import "UIImage+Color.h"
 #import "MainViewController.h"
+#import "PersonViewController.h"
+#import "UnitViewController.h"
 
 @interface LoginViewController ()
 
@@ -58,12 +60,32 @@
 //    [self showHudInView:self.view];
 //    
 //    [self hideHud];
-    MainViewController *vc = [MainViewController new];
     
-    [self presentViewController:vc animated:YES completion:^{
-        self.view.window.rootViewController = vc;
+    
+    
+    
+    
+    
+    NSMutableArray *vcs = [NSMutableArray array];
+    
+    PersonViewController *vc1 = [PersonViewController new];
+    vc1.title = @"个人";
+    [vcs addObject:vc1];
+    
+    UnitViewController *vc2 = [UnitViewController new];
+    vc2.title = @"单位";
+    [vcs addObject:vc2];
+    
+    MainViewController *slideSegmentController = [[MainViewController alloc] initWithViewControllers:vcs];
+    slideSegmentController.indicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    slideSegmentController.indicatorColor = [UIColor blackColor];
+    
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:slideSegmentController];
+    [nc.navigationBar setTintColor:[UIColor blackColor]];
+    
+    [self presentViewController:nc animated:YES completion:^{
+//        self.view.window.rootViewController = slideSegmentController;
     }];
-    
 }
 
 - (void)didReceiveMemoryWarning {

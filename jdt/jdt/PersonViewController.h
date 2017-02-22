@@ -1,5 +1,5 @@
 //
-//  MainViewController.h
+//  PersonViewController.h
 //  jdt
 //
 //  Created by Stephen Chin on 17/2/22.
@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "JYSlideSegmentController.h"
 
-@interface MainViewController : JYSlideSegmentController
+@interface PersonViewController : UIViewController
 
 @end
