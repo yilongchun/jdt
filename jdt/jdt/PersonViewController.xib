@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PersonViewController">
             <connections>
+                <outlet property="myScrollView" destination="POd-Bl-eA3" id="0KF-15-33O"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -17,22 +18,7 @@
             <subviews>
                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="POd-Bl-eA3">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                    <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="寄件人姓名" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aD9-LQ-TLr">
-                            <rect key="frame" x="15" y="20" width="75" height="18"/>
-                            <animations/>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                    </subviews>
                     <animations/>
-                    <constraints>
-                        <constraint firstItem="aD9-LQ-TLr" firstAttribute="top" secondItem="POd-Bl-eA3" secondAttribute="top" constant="20" id="9id-YH-bd5"/>
-                        <constraint firstAttribute="trailing" secondItem="aD9-LQ-TLr" secondAttribute="trailing" id="R4r-j1-j2o"/>
-                        <constraint firstItem="aD9-LQ-TLr" firstAttribute="leading" secondItem="POd-Bl-eA3" secondAttribute="leading" constant="15" id="Xme-cl-SfA"/>
-                        <constraint firstAttribute="bottom" secondItem="aD9-LQ-TLr" secondAttribute="bottom" id="ez5-xK-rhL"/>
-                    </constraints>
                 </scrollView>
             </subviews>
             <animations/>

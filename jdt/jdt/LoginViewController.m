@@ -54,6 +54,9 @@
     _loginBtn.titleLabel.font = DEFAULT_FONT;
     
     [_loginBtn addTarget:self action:@selector(login) forControlEvents:UIControlEventTouchUpInside];
+    
+    _account.text = @"1111111";
+    _password.text = @"1111111";
 }
 
 //隐藏键盘
@@ -101,21 +104,21 @@
             NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
             [ud setObject:[dic objectForKey:@"data"] forKey:LOGINED_USER];
             
-            NSMutableArray *vcs = [NSMutableArray array];
+//            NSMutableArray *vcs = [NSMutableArray array];
     
             PersonViewController *vc1 = [PersonViewController new];
-            vc1.title = @"个人";
-            [vcs addObject:vc1];
+//            vc1.title = @"个人";
+//            [vcs addObject:vc1];
     
-            UnitViewController *vc2 = [UnitViewController new];
-            vc2.title = @"单位";
-            [vcs addObject:vc2];
+//            UnitViewController *vc2 = [UnitViewController new];
+//            vc2.title = @"单位";
+//            [vcs addObject:vc2];
+//    
+//            MainViewController *slideSegmentController = [[MainViewController alloc] initWithViewControllers:vcs];
+//            slideSegmentController.indicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+//            slideSegmentController.indicatorColor = [UIColor blackColor];
     
-            MainViewController *slideSegmentController = [[MainViewController alloc] initWithViewControllers:vcs];
-            slideSegmentController.indicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
-            slideSegmentController.indicatorColor = [UIColor blackColor];
-    
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:slideSegmentController];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:vc1];
             [nc.navigationBar setTintColor:RGB(50, 54, 66)];
             
             [self presentViewController:nc animated:YES completion:^{

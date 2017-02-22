@@ -26,37 +26,37 @@
     application.statusBarHidden = NO;
     
     
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    NSDictionary *data = [ud objectForKey:LOGINED_USER];
-    if (data != nil) {
-        NSMutableArray *vcs = [NSMutableArray array];
-        
-        PersonViewController *vc1 = [PersonViewController new];
-        vc1.title = @"个人";
-        [vcs addObject:vc1];
-        
-        UnitViewController *vc2 = [UnitViewController new];
-        vc2.title = @"单位";
-        [vcs addObject:vc2];
-        
-        MainViewController *slideSegmentController = [[MainViewController alloc] initWithViewControllers:vcs];
-        slideSegmentController.indicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
-        slideSegmentController.indicatorColor = [UIColor blackColor];
-        
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:slideSegmentController];
-        [nc.navigationBar setTintColor:RGB(50, 54, 66)];
-        
-        self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-        self.window.rootViewController = nc;
-        [self.window makeKeyAndVisible];
-    }else{
+//    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+//    NSDictionary *data = [ud objectForKey:LOGINED_USER];
+//    if (data != nil) {
+//        NSMutableArray *vcs = [NSMutableArray array];
+//        
+//        PersonViewController *vc1 = [PersonViewController new];
+//        vc1.title = @"个人";
+//        [vcs addObject:vc1];
+//        
+//        UnitViewController *vc2 = [UnitViewController new];
+//        vc2.title = @"单位";
+//        [vcs addObject:vc2];
+//        
+//        MainViewController *slideSegmentController = [[MainViewController alloc] initWithViewControllers:vcs];
+//        slideSegmentController.indicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+//        slideSegmentController.indicatorColor = [UIColor blackColor];
+//        
+//        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:slideSegmentController];
+//        [nc.navigationBar setTintColor:RGB(50, 54, 66)];
+//        
+//        self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+//        self.window.rootViewController = nc;
+//        [self.window makeKeyAndVisible];
+//    }else{
         LoginViewController *vc = [LoginViewController new];
         //    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:vc];
         //    nc.navigationBar.titleTextAttributes = @{NSFontAttributeName: [UIFont fontWithName:kFont size:20],NSForegroundColorAttributeName:[UIColor whiteColor]};
         self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
         self.window.rootViewController = vc;
         [self.window makeKeyAndVisible];
-    }
+//    }
     
     return YES;
 }
