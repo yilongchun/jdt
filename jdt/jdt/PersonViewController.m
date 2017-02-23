@@ -109,6 +109,7 @@
     
     tf3 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label2.frame) + 20, Main_Screen_Width - 150 -20, 40)];
     tf3.borderStyle = UITextBorderStyleNone;
+    tf3.keyboardType = UIKeyboardTypePhonePad;
     tf3.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf3];
     
@@ -240,10 +241,9 @@
     }
     
     [self.view endEditing:YES];
+    
     [self showHudInView:self.view];
-    
-    
-    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.navigationController.view];
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         hud.mode = MBProgressHUDModeAnnularDeterminate;
@@ -270,7 +270,7 @@
     
     _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
     _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
+//    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
     
     NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         
@@ -284,22 +284,26 @@
     AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
         [self hideHud];
         NSLog(@"JSON: %@", responseObject);
-        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
         
-        NSNumber *code = [dic objectForKey:@"code"];
-        if ([code intValue] == 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-                hud.customView = imageView;
-                hud.mode = MBProgressHUDModeCustomView;
-                hud.label.text = @"修改成功";
-                
-            });
-            [hud hideAnimated:YES afterDelay:1.5];
-        }else{
-            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
-        }
+//        NSString *transString = [NSString stringWithString:[responseObject stringByRemovingPercentEncoding]];
+//        NSLog(@"transString:%@",transString);
+        
+//        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
+//        
+//        NSNumber *code = [dic objectForKey:@"code"];
+//        if ([code intValue] == 0) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+//                hud.customView = imageView;
+//                hud.mode = MBProgressHUDModeCustomView;
+//                hud.label.text = @"提交成功";
+//                
+//            });
+//            [hud hideAnimated:YES afterDelay:1.5];
+//        }else{
+//            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
+//        }
     } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
         NSLog(@"发生错误！%@",error);
         [self hideHud];
