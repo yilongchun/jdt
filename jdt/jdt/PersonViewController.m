@@ -250,7 +250,7 @@
     style.whRatio = 2.5;
     style.xScanRetangleOffset = 20;
     
-    style.anmiationStyle = LBXScanViewAnimationStyle_LineMove;
+    style.anmiationStyle = LBXScanViewAnimationStyle_LineStill;
     style.colorAngle = [UIColor colorWithRed:38./255 green:203./255. blue:216./255. alpha:1.0];
     //qq里面的线条图片
     UIImage *imgLine = [UIImage imageNamed:@"CodeScan.bundle/qrcode_scan_light_green"];
