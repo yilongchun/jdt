@@ -20,11 +20,18 @@
 
 #import "UserSettingViewController.h"
 
-@interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate>{
+@interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>{
     UITextField *tf1;
     UITextField *tf2;
     UITextField *tf3;
     UITextField *tf4;
+    
+    NSInteger btnTag;
+    UIImage *image1;
+    UIImage *image2;
+    
+    UIButton *imgBtn1;
+    UIButton *imgBtn2;
 }
 
 @end
@@ -85,7 +92,7 @@
     label4.font = SYSTEMFONT(15);
     [_myScrollView addSubview:label4];
     
-    UIButton *imgBtn1 = [[UIButton alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
+    imgBtn1 = [[UIButton alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
     imgBtn1.tag = 1;
     [imgBtn1 setBackgroundImage:[UIImage imageNamed:@"5"] forState:UIControlStateNormal];
     [imgBtn1 addTarget:self action:@selector(showPic:) forControlEvents:UIControlEventTouchUpInside];
@@ -97,7 +104,7 @@
     btn1Label.textAlignment = NSTextAlignmentCenter;
     [_myScrollView addSubview:btn1Label];
     
-    UIButton *imgBtn2 = [[UIButton alloc] initWithFrame:CGRectMake(Main_Screen_Width - 80 - 20, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
+    imgBtn2 = [[UIButton alloc] initWithFrame:CGRectMake(Main_Screen_Width - 80 - 20, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
     imgBtn2.tag = 2;
     [imgBtn2 setBackgroundImage:[UIImage imageNamed:@"5"] forState:UIControlStateNormal];
     [imgBtn2 addTarget:self action:@selector(showPic:) forControlEvents:UIControlEventTouchUpInside];
@@ -164,6 +171,44 @@
 
 -(void)showPic:(UIButton *)btn{
     DLog(@"%ld",btn.tag);
+    
+    btnTag = btn.tag;
+    
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"用户相册" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+            UIImagePickerController *imagePicker2 = [[UIImagePickerController alloc] init];
+            imagePicker2.delegate = self;
+            imagePicker2.allowsEditing = NO;
+            imagePicker2.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            imagePicker2.mediaTypes =  [[NSArray alloc] initWithObjects:@"public.image", nil];
+            [[imagePicker2 navigationBar] setTintColor:RGB(67,216,230)];
+            [[imagePicker2 navigationBar] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor blackColor], NSForegroundColorAttributeName, nil]];
+            [self presentViewController:imagePicker2 animated:YES completion:nil];
+        }];
+        [alert addAction:action1];
+        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"拍照" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            //检查相机模式是否可用
+            if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+                NSLog(@"sorry, no camera or camera is unavailable.");
+                return;
+            }
+            UIImagePickerController  *imagePicker1 = [[UIImagePickerController alloc] init];
+            imagePicker1.delegate = self;
+            imagePicker1.allowsEditing = NO;
+            imagePicker1.sourceType = UIImagePickerControllerSourceTypeCamera;
+            imagePicker1.mediaTypes =  [[NSArray alloc] initWithObjects:@"public.image", nil];
+            [self presentViewController:imagePicker1 animated:YES completion:nil];
+        }];
+        [alert addAction:action2];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        [alert addAction:cancel];
+        [self presentViewController:alert animated:YES completion:^{
+            
+        }];
 }
 
 -(void)setting{
@@ -242,4 +287,113 @@
 -(void)dealloc {
     [DictManager FinishDict];
 }
+
+//保存图片
+-(void)saveImageDocuments:(UIImage *)image path:(NSString *)path{
+    //拿到图片
+    UIImage *imagesave = image;
+    NSString *path_sandox = NSHomeDirectory();
+    //设置一个图片的存储路径
+    NSString *imagePath = [path_sandox stringByAppendingString:path];
+    //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
+    [UIImagePNGRepresentation(imagesave) writeToFile:imagePath atomically:YES];
+}
+// 读取并存贮到相册
+-(UIImage *)getDocumentImage:(NSString *)path{
+    // 读取沙盒路径图片
+    NSString *aPath3=[NSString stringWithFormat:@"%@%@",NSHomeDirectory(),path];
+    // 拿到沙盒路径图片
+    UIImage *imgFromUrl3=[[UIImage alloc]initWithContentsOfFile:aPath3];
+    // 图片保存相册
+    UIImageWriteToSavedPhotosAlbum(imgFromUrl3, self, nil, nil);
+    return imgFromUrl3;
+}
+
+#pragma mark - UIImagePickerController Delegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    
+    if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.image"]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        
+        NSData* data = UIImageJPEGRepresentation(image,0.1f);
+        DLog(@"%lu",(unsigned long)data.length);
+        if (btnTag == 1) {
+            image1 = [UIImage imageWithData:data];
+            [imgBtn1 setImage:image1 forState:UIControlStateNormal];
+        }else if (btnTag == 2){
+            image2 = [UIImage imageWithData:data];
+            [imgBtn2 setImage:image2 forState:UIControlStateNormal];
+        }
+        
+//        NSData *data2 = UIImageJPEGRepresentation(image,0.5f);
+//        DLog(@"%lu",(unsigned long)data2.length);
+//        
+//        NSData *data3 = UIImageJPEGRepresentation(image,1.0f);
+//        DLog(@"%lu",(unsigned long)data3.length);
+//        
+//        UIImage *timg1 = [UIImage imageWithData:data];
+//        UIImage *timg2 = [UIImage imageWithData:data2];
+//        UIImage *timg3 = [UIImage imageWithData:data3];
+//        [self saveImageDocuments:timg1 path:@"/Documents/test1.png"];
+//        [self saveImageDocuments:timg2 path:@"/Documents/test2.png"];
+//        [self saveImageDocuments:timg3 path:@"/Documents/test3.png"];
+//        
+//        [self getDocumentImage:@"/Documents/test1.png"];
+//        [self getDocumentImage:@"/Documents/test2.png"];
+//        [self getDocumentImage:@"/Documents/test3.png"];
+        
+        
+        //        if (type == 2) {
+        //            backgroundImage = [UIImage imageWithData:data];
+        //        }
+        
+//        [self getToken:data];
+        //        [self uploadImage];
+        
+        
+        //        [self.chooseBtn setImage:choosedImage forState:UIControlStateNormal];
+        
+        //        NSData* data = UIImageJPEGRepresentation(img,0.7f);
+        //        DLog(@"type:%d",type);
+        //[self uploadImage:data];
+        
+        
+        
+        
+        
+        //        NSData *fildData = UIImageJPEGRepresentation(img, 0.5);//UIImagePNGRepresentation(img); //
+        //照片
+        //        [self uploadImg:fildData];
+        //        self.fileData = UIImageJPEGRepresentation(img, 1.0);
+    }
+    [picker dismissViewControllerAnimated:YES completion:^{
+        
+        
+    }];
+}
+
+#pragma mark - UINavigationControllerDelegate
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    // bug fixes: UIIMagePickerController使用中偷换StatusBar颜色的问题
+    if ([navigationController isKindOfClass:[UIImagePickerController class]] &&
+        ((UIImagePickerController *)navigationController).sourceType ==     UIImagePickerControllerSourceTypePhotoLibrary) {
+        //        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+        //        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:NO];
+        
+        viewController.jz_navigationBarTintColor = RGB(50, 54, 66);
+        navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        [navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor],NSForegroundColorAttributeName,nil]];
+        
+        DLog(@"%@",viewController);
+    }else{
+        DLog(@"%@",viewController);
+    }
+    //    if([viewController isKindOfClass:[SettingViewController class]]){
+    //        NSLog(@"返回");
+    //        return;
+    //    }
+}
+
 @end
