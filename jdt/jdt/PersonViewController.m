@@ -34,6 +34,8 @@
     
     UIButton *imgBtn1;
     UIButton *imgBtn2;
+    
+    UILabel *countLabel;
 }
 
 @end
@@ -58,6 +60,27 @@
     [item1 setTintColor:[UIColor whiteColor]];
     
     self.navigationItem.rightBarButtonItem = item1;
+    
+    UIView *itemView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 40)];
+    UIButton *saveBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 40)];
+    [saveBtn setTitle:@"保存" forState:UIControlStateNormal];
+    [saveBtn addTarget:self action:@selector(saveToLocal) forControlEvents:UIControlEventTouchUpInside];
+    [saveBtn setTitleColor:RGBA(255, 255, 255, 0.2) forState:UIControlStateHighlighted];
+    saveBtn.titleLabel.font = SYSTEMFONT(17);
+//    saveBtn.backgroundColor = [UIColor grayColor];
+    [itemView addSubview:saveBtn];
+//    itemView.backgroundColor = [UIColor whiteColor];
+    
+    countLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 10, 70, 30)];
+    countLabel.textColor = [UIColor whiteColor];
+    countLabel.font = SYSTEMFONT(12);
+    [itemView addSubview:countLabel];
+//    countLabel.backgroundColor = [UIColor lightGrayColor];
+    
+    UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithCustomView:itemView];
+    self.navigationItem.leftBarButtonItem = leftItem;
+    
+    [self setCount];
     
     UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(15, 20, 130, 40)];
     label1.text = @"寄件人姓名";
@@ -164,6 +187,12 @@
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dh:) name:@"dh" object:nil];
+    
+}
+
+//本地数量
+-(void)setCount{
+    countLabel.text = [NSString stringWithFormat:@"(%d条)",0];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -178,8 +207,114 @@
     tf4.text = text.userInfo[@"danhao"];
 }
 
+-(void)saveToLocal{
+    
+}
+
+//提交
 -(void)submit{
     
+    if ([tf1.text isEqualToString:@""]) {
+        [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
+        return;
+    }
+    if ([tf2.text isEqualToString:@""]) {
+        [self showHintInView:self.view hint:@"请填写身份证号码"];
+        return;
+    }
+    if ([tf3.text isEqualToString:@""]) {
+        [self showHintInView:self.view hint:@"请输入手机号码"];
+        return;
+    }
+    if ([tf4.text isEqualToString:@""]) {
+        [self showHintInView:self.view hint:@"请填写快递单号"];
+        return;
+    }
+    if (image1 == nil) {
+        [self showHintInView:self.view hint:@"请上传内件照"];
+        return;
+    }
+    if (image2 == nil) {
+        [self showHintInView:self.view hint:@"请上传封箱照"];
+        return;
+    }
+    
+    [self.view endEditing:YES];
+    [self showHudInView:self.view];
+    
+    
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.navigationController.view];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        hud.mode = MBProgressHUDModeAnnularDeterminate;
+        hud.label.text = @"上传中";
+    });
+    
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+    
+    [parameters setValue:tf1.text forKey:@"name"];//姓名
+    [parameters setValue:tf2.text forKey:@"idcard"];//身份证
+    [parameters setValue:tf3.text forKey:@"mobile"];//手机号
+    [parameters setValue:tf4.text forKey:@"no"];//单号
+    
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *user = [ud objectForKey:LOGINED_USER];
+    [parameters setObject:[user objectForKey:@"id"] forKey:@"uid"];
+    [parameters setObject:[user objectForKey:@"token"] forKey:@"tk"];
+    
+    NSString *url = [NSString stringWithFormat:@"%@%@",kHost,kAdd];
+    
+    
+    AFHTTPRequestOperationManager* _manager = [AFHTTPRequestOperationManager manager];
+    
+    _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
+    
+    NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        NSData *data1 = UIImageJPEGRepresentation(image1,1.0f);
+        [formData appendPartWithFileData:data1 name:@"file" fileName:@"1.png" mimeType:@"image/png"];
+        NSData *data2 = UIImageJPEGRepresentation(image2,1.0f);
+        [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
+        
+    } error:nil];
+    
+    AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
+        [self hideHud];
+        NSLog(@"JSON: %@", responseObject);
+        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
+        
+        NSNumber *code = [dic objectForKey:@"code"];
+        if ([code intValue] == 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                hud.customView = imageView;
+                hud.mode = MBProgressHUDModeCustomView;
+                hud.label.text = @"修改成功";
+                
+            });
+            [hud hideAnimated:YES afterDelay:1.5];
+        }else{
+            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
+        }
+    } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
+        NSLog(@"发生错误！%@",error);
+        [self hideHud];
+    }];
+    
+    [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+//        DLog(@"%f",(float)totalBytesWritten/totalBytesExpectedToWrite);
+        float progress = (float)totalBytesWritten/totalBytesExpectedToWrite;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            hud.progress = progress;
+        });
+    }];  
+    
+    [operation start];
 }
 
 -(void)showPic:(UIButton *)btn{

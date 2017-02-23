@@ -29,6 +29,8 @@
 #define kTodayCount @"/delivery/todayCount"
 //修改密码
 #define kUpdatePwd @"/courier/updatePwd"
+//快递提交
+#define kAdd @"/delivery/add"
 
 
 #define LOGINED_USER @"loginedUser"
