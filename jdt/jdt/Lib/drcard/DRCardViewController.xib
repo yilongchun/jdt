@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DRCardViewController">
             <connections>
-                <outlet property="logoBtn" destination="R9c-uI-Dlj" id="iKB-BG-ueP"/>
                 <outlet property="photoBtn" destination="mZC-RX-B99" id="qyQ-Ca-lcn"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="NB3-IE-uil"/>
             </connections>
@@ -22,8 +21,9 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="AWE-Lh-b3O" userLabel="FlashButton">
-                            <rect key="frame" x="0.0" y="0.0" width="44" height="44"/>
+                            <rect key="frame" x="5" y="20" width="44" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <animations/>
                             <state key="normal" backgroundImage="exocr-back_camera_btn.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -31,19 +31,10 @@
                                 <action selector="backAc:" destination="-1" eventType="touchUpInside" id="MbI-LD-MbH"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="R9c-uI-Dlj" userLabel="logobtn">
-                            <rect key="frame" x="268" y="524" width="44" height="44"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                            <accessibility key="accessibilityConfiguration">
-                                <accessibilityTraits key="traits" image="YES" notEnabled="YES"/>
-                            </accessibility>
-                            <state key="normal" backgroundImage="exocr-ydbs.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                        </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="aKn-1d-7VS" userLabel="FlashButton">
-                            <rect key="frame" x="276" y="0.0" width="44" height="44"/>
+                            <rect key="frame" x="271" y="20" width="44" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                            <animations/>
                             <state key="normal" backgroundImage="exocr-flash_camera_btn.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -52,8 +43,9 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="mZC-RX-B99">
-                            <rect key="frame" x="137" y="7" width="46" height="30"/>
+                            <rect key="frame" x="137" y="27" width="46" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <animations/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <state key="normal" title="相册"/>
                             <connections>
@@ -61,19 +53,20 @@
                             </connections>
                         </button>
                     </subviews>
+                    <animations/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <accessibility key="accessibilityConfiguration">
                         <accessibilityTraits key="traits" image="YES" notEnabled="YES"/>
                     </accessibility>
                 </view>
             </subviews>
+            <animations/>
             <color key="backgroundColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
             <point key="canvasLocation" x="356" y="369"/>
         </view>
     </objects>
     <resources>
-        <image name="exocr-back_camera_btn.png" width="171" height="171"/>
-        <image name="exocr-flash_camera_btn.png" width="173" height="172"/>
-        <image name="exocr-ydbs.png" width="173" height="172"/>
+        <image name="exocr-back_camera_btn.png" width="85" height="85"/>
+        <image name="exocr-flash_camera_btn.png" width="86" height="86"/>
     </resources>
 </document>

@@ -18,10 +18,13 @@
 #import "DRCardViewController.h"
 #import "DRCardResultViewController.h"
 
-@interface PersonViewController ()<IDCamCotrllerDelegate>{
+#import "UserSettingViewController.h"
+
+@interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate>{
     UITextField *tf1;
     UITextField *tf2;
     UITextField *tf3;
+    UITextField *tf4;
 }
 
 @end
@@ -31,6 +34,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    self.title = @"寄递通";
+    
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor],NSForegroundColorAttributeName,nil]]; 
     
     self.view.backgroundColor = [UIColor whiteColor];
     self.jz_navigationBarTintColor = RGB(50, 54, 66);
@@ -52,43 +60,97 @@
     tf1.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf1];
     
-    UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label1.frame) + 40, 130, 40)];
+    UILabel *label2 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label1.frame) + 20, 130, 40)];
     label2.text = @"身份证号码";
     label2.font = SYSTEMFONT(15);
     [_myScrollView addSubview:label2];
     
-    tf2 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label1.frame) + 40, Main_Screen_Width - 150 -20, 40)];
+    tf2 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label1.frame) + 20, Main_Screen_Width - 150 -20, 40)];
     tf2.borderStyle = UITextBorderStyleNone;
     tf2.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf2];
     
-    UILabel *label3 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label2.frame) + 40, 130, 40)];
+    UILabel *label3 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label2.frame) + 20, 130, 40)];
     label3.text = @"寄件人手机号码";
     label3.font = SYSTEMFONT(15);
     [_myScrollView addSubview:label3];
     
-    tf3 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label2.frame) + 40, Main_Screen_Width - 150 -20, 40)];
+    tf3 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label2.frame) + 20, Main_Screen_Width - 150 -20, 40)];
     tf3.borderStyle = UITextBorderStyleNone;
     tf3.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf3];
     
-    UILabel *label4 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label3.frame) + 80, 150, 40)];
+    UILabel *label4 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(label3.frame) + 40, 150, 40)];
     label4.text = @"寄递物品验视照片";
     label4.font = SYSTEMFONT(15);
     [_myScrollView addSubview:label4];
     
-    UIButton *imgBtn1 = [[UIButton alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label3.frame) + 40, 80, 80)];
-    [imgBtn1 setImage:[UIImage imageNamed:@"5"] forState:UIControlStateNormal];
+    UIButton *imgBtn1 = [[UIButton alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
+    imgBtn1.tag = 1;
+    [imgBtn1 setBackgroundImage:[UIImage imageNamed:@"5"] forState:UIControlStateNormal];
+    [imgBtn1 addTarget:self action:@selector(showPic:) forControlEvents:UIControlEventTouchUpInside];
     [_myScrollView addSubview:imgBtn1];
+    UILabel *btn1Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(imgBtn1.frame), CGRectGetMaxY(imgBtn1.frame) + 5, CGRectGetWidth(imgBtn1.frame), 20)];
+    btn1Label.font = SYSTEMFONT(15);
+    btn1Label.text = @"内件照";
+    btn1Label.textColor = [UIColor grayColor];
+    btn1Label.textAlignment = NSTextAlignmentCenter;
+    [_myScrollView addSubview:btn1Label];
     
+    UIButton *imgBtn2 = [[UIButton alloc] initWithFrame:CGRectMake(Main_Screen_Width - 80 - 20, CGRectGetMaxY(label3.frame) + 20, 80, 80)];
+    imgBtn2.tag = 2;
+    [imgBtn2 setBackgroundImage:[UIImage imageNamed:@"5"] forState:UIControlStateNormal];
+    [imgBtn2 addTarget:self action:@selector(showPic:) forControlEvents:UIControlEventTouchUpInside];
+    [_myScrollView addSubview:imgBtn2];
+    UILabel *btn2Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(imgBtn2.frame), CGRectGetMaxY(imgBtn2.frame) + 5, CGRectGetWidth(imgBtn2.frame), 20)];
+    btn2Label.font = SYSTEMFONT(15);
+    btn2Label.text = @"封箱照";
+    btn2Label.textColor = [UIColor grayColor];
+    btn2Label.textAlignment = NSTextAlignmentCenter;
+    [_myScrollView addSubview:btn2Label];
     
+    UILabel *label5 = [[UILabel alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(btn2Label.frame) + 20, 150, 40)];
+    label5.text = @"寄递单号";
+    label5.font = SYSTEMFONT(15);
+    [_myScrollView addSubview:label5];
     
-    UIButton *idcardBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(imgBtn1.frame) + 20, Main_Screen_Width - 30, 40)];
+    tf4 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(btn2Label.frame) + 20, Main_Screen_Width - 150 -20, 40)];
+    tf4.borderStyle = UITextBorderStyleNone;
+    tf4.backgroundColor = [UIColor lightGrayColor];
+    [_myScrollView addSubview:tf4];
+    
+    UIButton *idcardBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(tf4.frame) + 20, Main_Screen_Width - 30, 40)];
     [idcardBtn addTarget:self action:@selector(IDCardClick) forControlEvents:UIControlEventTouchUpInside];
     [idcardBtn setImage:[UIImage imageNamed:@"7"] forState:UIControlStateNormal];
     [idcardBtn setTitle:@" 身份证扫描" forState:UIControlStateNormal];
+    [idcardBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
     [idcardBtn setBackgroundImage:[UIImage imageWithColor:RGB(29, 206, 119) size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
     [_myScrollView addSubview:idcardBtn];
+    
+    UIButton *drcardBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(idcardBtn.frame) + 20, Main_Screen_Width - 30, 40)];
+    [drcardBtn addTarget:self action:@selector(DRCardClick) forControlEvents:UIControlEventTouchUpInside];
+    [drcardBtn setImage:[UIImage imageNamed:@"7"] forState:UIControlStateNormal];
+    [drcardBtn setTitle:@" 驾驶证扫描" forState:UIControlStateNormal];
+    [drcardBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    [drcardBtn setBackgroundImage:[UIImage imageWithColor:RGB(29, 206, 119) size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
+    [_myScrollView addSubview:drcardBtn];
+    
+    UIButton *dhBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(drcardBtn.frame) + 20, Main_Screen_Width - 30, 40)];
+    [dhBtn addTarget:self action:@selector(DhClick) forControlEvents:UIControlEventTouchUpInside];
+    [dhBtn setImage:[UIImage imageNamed:@"6"] forState:UIControlStateNormal];
+    [dhBtn setTitle:@" 寄递单号扫描" forState:UIControlStateNormal];
+    [dhBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    [dhBtn setBackgroundImage:[UIImage imageWithColor:RGB(29, 206, 119) size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
+    [_myScrollView addSubview:dhBtn];
+    
+    UIButton *submitBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(dhBtn.frame) + 20, Main_Screen_Width - 30, 40)];
+    [submitBtn addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
+    [submitBtn setTitle:@"提交" forState:UIControlStateNormal];
+    [submitBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    [submitBtn setBackgroundImage:[UIImage imageWithColor:RGB(29, 206, 119) size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
+    [_myScrollView addSubview:submitBtn];
+    
+    [_myScrollView setContentSize:CGSizeMake(Main_Screen_Width, CGRectGetMaxY(submitBtn.frame) + 50)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -96,8 +158,17 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void)setting{
+-(void)submit{
     
+}
+
+-(void)showPic:(UIButton *)btn{
+    DLog(@"%ld",btn.tag);
+}
+
+-(void)setting{
+    UserSettingViewController *vc = [[UserSettingViewController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 /*
@@ -109,6 +180,10 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+-(void)DhClick{
+    
+}
 
 - (void)IDCardClick{
 //    IDCardResultViewController *IDRstVc = [[IDCardResultViewController alloc] init];
@@ -140,21 +215,23 @@
     }
 }
 
-- (IBAction)action2:(id)sender {
-//    DRCardViewController * controller = [[DRCardViewController alloc] initWithNibName:nil bundle:nil];
-//    controller.DRCamDelegate = self;
-//    [self.navigationController pushViewController:controller animated:YES];
+- (void)DRCardClick{
+    DRCardViewController * controller = [[DRCardViewController alloc] initWithNibName:nil bundle:nil];
+    controller.DRCamDelegate = self;
+    [self.navigationController pushViewController:controller animated:YES];
 }
 -(void)didEndRecDRWithResult:(DrCardInfo* ) drInfo from:(id)sender{
-    __weak UIViewController * vc = (UIViewController*)sender;
+//    __weak UIViewController * vc = (UIViewController*)sender;
     
     if (![DrCardInfo getNoShowDRResultView]) {
         if(drInfo != nil)
         {
-            DRCardResultViewController * DRRstVc = [[DRCardResultViewController alloc] init];
-            DRRstVc.DRInfo = drInfo;
-            [vc.navigationController pushViewController:DRRstVc animated:NO];
-            NSLog(@"push drCardResultViewController");
+            tf1.text = drInfo.cardId;
+            tf2.text = drInfo.name;
+//            DRCardResultViewController * DRRstVc = [[DRCardResultViewController alloc] init];
+//            DRRstVc.DRInfo = drInfo;
+//            [vc.navigationController pushViewController:DRRstVc animated:NO];
+//            NSLog(@"push drCardResultViewController");
         }
     } else {
         [self.navigationController popViewControllerAnimated:YES];

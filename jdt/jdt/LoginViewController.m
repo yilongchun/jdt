@@ -99,7 +99,7 @@
         
         NSNumber *code = [dic objectForKey:@"code"];
         if ([code intValue] == 0) {
-            [self showHintInView:self.view hint:@"登录成功"];
+//            [self showHintInView:self.view hint:@"登录成功"];
             
             NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
             [ud setObject:[dic objectForKey:@"data"] forKey:LOGINED_USER];
@@ -130,8 +130,6 @@
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [self hideHud];
-        
-        
     }];
 }
 

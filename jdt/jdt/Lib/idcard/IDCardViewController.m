@@ -77,7 +77,7 @@ CGRect getIDPreViewFrame( int previewWidth, int previewHeight)
     
     lft = (previewWidth-cardw)/2;
     top = (previewHeight-cardh)/2;
-    CGRect r = CGRectMake(lft, top, cardw, cardh);
+    CGRect r = CGRectMake(lft, top + 20, cardw, cardh);
     return r;
 }
 
@@ -102,6 +102,11 @@ CGRect getIDPreViewFrame( int previewWidth, int previewHeight)
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    // 禁用 iOS7 返回手势
+    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+        self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+    }
     
     self.navigationController.navigationBarHidden = YES;
     self.bDoubleCheck = [IdInfo shouldEnableDoubleCheck];

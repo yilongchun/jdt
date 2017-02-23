@@ -12,7 +12,7 @@
 //是否获取整个驾驶证图片
 #define GET_FULLIMAGE 1
 //是否展示logo
-#define DISPLAY_LOGO_DR 1
+#define DISPLAY_LOGO_DR 0
 
 @interface DrCardInfo : NSObject
 {

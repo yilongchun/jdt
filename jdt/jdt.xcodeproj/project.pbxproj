@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		44F306D91E5E9070006903E5 /* UserSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F306D71E5E9070006903E5 /* UserSettingViewController.m */; };
+		44F306DA1E5E9070006903E5 /* UserSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F306D81E5E9070006903E5 /* UserSettingViewController.xib */; };
 		44F9BE9C1E5D3EA50070F7B8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BE9B1E5D3EA50070F7B8 /* main.m */; };
 		44F9BE9F1E5D3EA50070F7B8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BE9E1E5D3EA50070F7B8 /* AppDelegate.m */; };
 		44F9BEA21E5D3EA50070F7B8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44F9BEA11E5D3EA50070F7B8 /* ViewController.m */; };
@@ -88,6 +90,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		44F306D61E5E9070006903E5 /* UserSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSettingViewController.h; sourceTree = "<group>"; };
+		44F306D71E5E9070006903E5 /* UserSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSettingViewController.m; sourceTree = "<group>"; };
+		44F306D81E5E9070006903E5 /* UserSettingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserSettingViewController.xib; sourceTree = "<group>"; };
 		44F9BE971E5D3EA50070F7B8 /* jdt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jdt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44F9BE9B1E5D3EA50070F7B8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		44F9BE9D1E5D3EA50070F7B8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -287,6 +292,9 @@
 				44F9BF5A1E5D6DA70070F7B8 /* UnitViewController.h */,
 				44F9BF5B1E5D6DA70070F7B8 /* UnitViewController.m */,
 				44F9BF5C1E5D6DA70070F7B8 /* UnitViewController.xib */,
+				44F306D61E5E9070006903E5 /* UserSettingViewController.h */,
+				44F306D71E5E9070006903E5 /* UserSettingViewController.m */,
+				44F306D81E5E9070006903E5 /* UserSettingViewController.xib */,
 				44F9BEA31E5D3EA50070F7B8 /* Main.storyboard */,
 				44F9BEA61E5D3EA50070F7B8 /* Assets.xcassets */,
 				44F9BEAB1E5D3EA50070F7B8 /* Info.plist */,
@@ -667,6 +675,7 @@
 				44F9BF401E5D68FE0070F7B8 /* PersonViewController.xib in Resources */,
 				44F9C0191E5D76060070F7B8 /* DRCardViewController.xib in Resources */,
 				44F9C0261E5D76060070F7B8 /* IDCardViewController.xib in Resources */,
+				44F306DA1E5E9070006903E5 /* UserSettingViewController.xib in Resources */,
 				44F9BEFD1E5D64180070F7B8 /* btnCheck.png in Resources */,
 				44F9C0211E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */,
 				44F9C01A1E5D76060070F7B8 /* exocr-back_camera_btn@2x.png in Resources */,
@@ -741,6 +750,7 @@
 				44F9BEE51E5D5E100070F7B8 /* IQUIView+Hierarchy.m in Sources */,
 				44F9BF0C1E5D64380070F7B8 /* UIViewController+RecursiveDescription.m in Sources */,
 				44F9BF0A1E5D64380070F7B8 /* UIViewController+DismissKeyboard.m in Sources */,
+				44F306D91E5E9070006903E5 /* UserSettingViewController.m in Sources */,
 				44F9C01E1E5D76060070F7B8 /* IDCameraController.m in Sources */,
 				44F9C0171E5D76060070F7B8 /* DRCardResultViewController.m in Sources */,
 				44F9BE9C1E5D3EA50070F7B8 /* main.m in Sources */,
@@ -896,6 +906,7 @@
 				44F9BEB01E5D3EA50070F7B8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

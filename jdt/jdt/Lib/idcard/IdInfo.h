@@ -13,7 +13,7 @@
 #define GET_FULLIMAGE 1
 
 //是否展示logo
-#define DISPLAY_LOGO_ID 1
+#define DISPLAY_LOGO_ID 0
 
 @interface IdInfo : NSObject
 {

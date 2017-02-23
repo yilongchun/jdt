@@ -23,7 +23,13 @@
 
 #define kHost @"http://115.29.103.36:88/"
 
+//登录
 #define kLogin @"courier/login"
+//当日收件数量
+#define kTodayCount @"/delivery/todayCount"
+//修改密码
+#define kUpdatePwd @"/courier/updatePwd"
+
 
 #define LOGINED_USER @"loginedUser"
 #define DEFAULT_FONT SYSTEMFONT(17)
