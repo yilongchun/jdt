@@ -20,6 +20,8 @@
 
 #import "UserSettingViewController.h"
 
+#import "LBXScanViewController.h"
+
 @interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>{
     UITextField *tf1;
     UITextField *tf2;
@@ -158,11 +160,22 @@
     [_myScrollView addSubview:submitBtn];
     
     [_myScrollView setContentSize:CGSizeMake(Main_Screen_Width, CGRectGetMaxY(submitBtn.frame) + 50)];
+    
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dh:) name:@"dh" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+//接收到单号结果
+- (void)dh:(NSNotification *)text{
+    NSLog(@"%@",text.userInfo[@"danhao"]);
+    NSLog(@"－－－－－接收到通知------");
+    tf4.text = text.userInfo[@"danhao"];
 }
 
 -(void)submit{
@@ -227,7 +240,36 @@
 */
 
 -(void)DhClick{
+    //设置扫码区域参数
+    LBXScanViewStyle *style = [[LBXScanViewStyle alloc]init];
+    style.centerUpOffset = 60;
+    style.photoframeAngleStyle = LBXScanViewPhotoframeAngleStyle_Outer;
+    style.photoframeLineW = 6;
+    style.photoframeAngleW = 24;
+    style.photoframeAngleH = 24;
+    style.whRatio = 2.5;
+    style.xScanRetangleOffset = 20;
     
+    style.anmiationStyle = LBXScanViewAnimationStyle_LineMove;
+    style.colorAngle = [UIColor colorWithRed:38./255 green:203./255. blue:216./255. alpha:1.0];
+    //qq里面的线条图片
+    UIImage *imgLine = [UIImage imageNamed:@"CodeScan.bundle/qrcode_scan_light_green"];
+    //    UIImage *imgLine = [UIImage imageNamed:@"CodeScan.bundle/qrcode_scan_full_net"];
+    
+    style.animationImage = imgLine;
+    
+    LBXScanViewController *vc = [LBXScanViewController new];
+    vc.style = style;
+    vc.isQQSimulator = YES;
+    vc.title = @"扫描条形码";
+   
+    
+//    UIBarButtonItem *backItem=[[UIBarButtonItem alloc] init];
+//    UIImage *backImage = [UIImage imageNamed:@"navi_back2"];
+//    [backItem setBackButtonBackgroundImage:[backImage resizableImageWithCapInsets:UIEdgeInsetsMake(0, backImage.size.width, 0, 0)] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];//更改背景图片
+//    self.navigationItem.backBarButtonItem = backItem;
+    
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)IDCardClick{
@@ -342,30 +384,6 @@
 //        [self getDocumentImage:@"/Documents/test1.png"];
 //        [self getDocumentImage:@"/Documents/test2.png"];
 //        [self getDocumentImage:@"/Documents/test3.png"];
-        
-        
-        //        if (type == 2) {
-        //            backgroundImage = [UIImage imageWithData:data];
-        //        }
-        
-//        [self getToken:data];
-        //        [self uploadImage];
-        
-        
-        //        [self.chooseBtn setImage:choosedImage forState:UIControlStateNormal];
-        
-        //        NSData* data = UIImageJPEGRepresentation(img,0.7f);
-        //        DLog(@"type:%d",type);
-        //[self uploadImage:data];
-        
-        
-        
-        
-        
-        //        NSData *fildData = UIImageJPEGRepresentation(img, 0.5);//UIImagePNGRepresentation(img); //
-        //照片
-        //        [self uploadImg:fildData];
-        //        self.fileData = UIImageJPEGRepresentation(img, 1.0);
     }
     [picker dismissViewControllerAnimated:YES completion:^{
         
