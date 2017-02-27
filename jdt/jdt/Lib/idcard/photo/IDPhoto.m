@@ -80,7 +80,7 @@ static UIImage *originImg;
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     picker.delegate = self;
     //设置选择后的图片可被编辑
-    picker.allowsEditing = NO;
+    picker.allowsEditing = YES;
     [target presentModalViewController:picker animated:YES];
 }
 

@@ -737,8 +737,8 @@
 {
     if (idInfo.type != 0) { //识别成功
         DLog(@"%@",idInfo);
-        tf1.text = idInfo.code;
-        tf2.text = idInfo.name;
+        tf1.text = idInfo.name;
+        tf2.text = idInfo.code;
 //        IDInfo = idInfo;
 //        [self.delegate returnIDResult:idInfo from:self];
 //        [self loadData];
@@ -758,8 +758,8 @@
     if (![DrCardInfo getNoShowDRResultView]) {
         if(drInfo != nil)
         {
-            tf1.text = drInfo.cardId;
-            tf2.text = drInfo.name;
+            tf1.text = drInfo.name;
+            tf2.text = drInfo.cardId;
 //            DRCardResultViewController * DRRstVc = [[DRCardResultViewController alloc] init];
 //            DRRstVc.DRInfo = drInfo;
 //            [vc.navigationController pushViewController:DRRstVc animated:NO];

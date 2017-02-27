@@ -347,11 +347,14 @@ CGRect getDRPreViewFrame( int previewWidth, int previewHeight)
 #pragma mark - DRPhotoDelegate
 - (void)didEndPhotoRecDRWithResult:(DrCardInfo *)drInfo from:(id)sender
 {
-    if (![DrCardInfo getNoShowDRResultView]) {
-        DRCardResultViewController *drc = [[DRCardResultViewController alloc] init];
-        drc.DRInfo = drInfo;
-        [self.navigationController pushViewController:drc animated:YES];
-    }
+//    if (![DrCardInfo getNoShowDRResultView]) {
+//        DRCardResultViewController *drc = [[DRCardResultViewController alloc] init];
+//        drc.DRInfo = drInfo;
+//        [self.navigationController pushViewController:drc animated:YES];
+//    }
+    
+    [DRCamDelegate didEndRecDRWithResult:drInfo from:self];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void)didFinishPhotoRec

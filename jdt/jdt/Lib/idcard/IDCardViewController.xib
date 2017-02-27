@@ -47,7 +47,9 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <animations/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                            <state key="normal" title="相册"/>
+                            <state key="normal" title="相册">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
                             <connections>
                                 <action selector="photo:" destination="-1" eventType="touchUpInside" id="dQi-Tb-PAP"/>
                             </connections>
