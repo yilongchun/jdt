@@ -252,34 +252,32 @@
 //保存到本地
 -(void)saveToLocal{
     DLog(@"saveToLocal");
-    if ([tf1.text isEqualToString:@""]) {
-        [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
-        return;
-    }
-    if ([tf2.text isEqualToString:@""]) {
-        [self showHintInView:self.view hint:@"请填写身份证号码"];
-        return;
-    }
-    if ([tf3.text isEqualToString:@""]) {
-        [self showHintInView:self.view hint:@"请输入手机号码"];
-        return;
-    }
-    if ([tf4.text isEqualToString:@""]) {
-        [self showHintInView:self.view hint:@"请填写快递单号"];
-        return;
-    }
-    if (image1 == nil) {
-        [self showHintInView:self.view hint:@"请上传内件照"];
-        return;
-    }
-    if (image2 == nil) {
-        [self showHintInView:self.view hint:@"请上传封箱照"];
-        return;
-    }
+//    if ([tf1.text isEqualToString:@""]) {
+//        [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
+//        return;
+//    }
+//    if ([tf2.text isEqualToString:@""]) {
+//        [self showHintInView:self.view hint:@"请填写身份证号码"];
+//        return;
+//    }
+//    if ([tf3.text isEqualToString:@""]) {
+//        [self showHintInView:self.view hint:@"请输入手机号码"];
+//        return;
+//    }
+//    if ([tf4.text isEqualToString:@""]) {
+//        [self showHintInView:self.view hint:@"请填写快递单号"];
+//        return;
+//    }
+//    if (image1 == nil) {
+//        [self showHintInView:self.view hint:@"请上传内件照"];
+//        return;
+//    }
+//    if (image2 == nil) {
+//        [self showHintInView:self.view hint:@"请上传封箱照"];
+//        return;
+//    }
     
-    [self.view endEditing:YES];
     
-    [self showHudInView:self.view];
     
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSDictionary *user = [ud objectForKey:LOGINED_USER];
@@ -311,7 +309,7 @@
     
     BOOL f = [DBUtil insertData:parameters];
     
-    [DBUtil queryData:[user objectForKey:@"id"]];
+//    [DBUtil queryData:[user objectForKey:@"id"]];
     
     
     [self setCount];
@@ -341,6 +339,90 @@
 -(void)location:(UIButton *)btn{
     if ([CLLocationManager locationServicesEnabled]) { // 判断是否打开了位置服务
         saveTag = btn.tag;
+        
+        if (saveTag == 1) {
+            if ([tf1.text isEqualToString:@""]) {
+                [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
+                return;
+            }
+            if ([tf2.text isEqualToString:@""]) {
+                [self showHintInView:self.view hint:@"请填写身份证号码"];
+                return;
+            }
+            if ([tf3.text isEqualToString:@""]) {
+                [self showHintInView:self.view hint:@"请输入手机号码"];
+                return;
+            }
+            if ([tf4.text isEqualToString:@""]) {
+                [self showHintInView:self.view hint:@"请填写快递单号"];
+                return;
+            }
+            if (image1 == nil) {
+                [self showHintInView:self.view hint:@"请上传内件照"];
+                return;
+            }
+            if (image2 == nil) {
+                [self showHintInView:self.view hint:@"请上传封箱照"];
+                return;
+            }
+            
+            
+        }else if (saveTag == 2){
+            BOOL checkflag = NO;
+            
+            if (![tf1.text isEqualToString:@""]) {
+                checkflag = YES;
+            }
+            if (![tf2.text isEqualToString:@""]) {
+                checkflag = YES;
+            }
+            if (![tf3.text isEqualToString:@""]) {
+                checkflag = YES;
+            }
+            if (![tf4.text isEqualToString:@""]) {
+                checkflag = YES;
+            }
+            if (image1 != nil) {
+                checkflag = YES;
+            }
+            if (image2 != nil) {
+                checkflag = YES;
+            }
+            
+            //有数据 就要验证
+            if (checkflag) {
+                
+                if ([tf1.text isEqualToString:@""]) {
+                    [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
+                    return;
+                }
+                if ([tf2.text isEqualToString:@""]) {
+                    [self showHintInView:self.view hint:@"请填写身份证号码"];
+                    return;
+                }
+                if ([tf3.text isEqualToString:@""]) {
+                    [self showHintInView:self.view hint:@"请输入手机号码"];
+                    return;
+                }
+                if ([tf4.text isEqualToString:@""]) {
+                    [self showHintInView:self.view hint:@"请填写快递单号"];
+                    return;
+                }
+                if (image1 == nil) {
+                    [self showHintInView:self.view hint:@"请上传内件照"];
+                    return;
+                }
+                if (image2 == nil) {
+                    [self showHintInView:self.view hint:@"请上传封箱照"];
+                    return;
+                }
+            }
+            
+            [self.view endEditing:YES];
+            
+            [self showHudInView:self.view];
+        }
+        
         [self.locationManager startUpdatingLocation];//开始定位
     }else{
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"定位服务已经关闭" message:@"请进入系统【设置】>【隐私】>【定位服务】中打开开关，并允许本应用使用定位服务" preferredStyle:UIAlertControllerStyleAlert];
@@ -380,32 +462,7 @@
     
     //有数据 就要验证
     if (checkflag) {
-        
-        if ([tf1.text isEqualToString:@""]) {
-            [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
-            return;
-        }
-        if ([tf2.text isEqualToString:@""]) {
-            [self showHintInView:self.view hint:@"请填写身份证号码"];
-            return;
-        }
-        if ([tf3.text isEqualToString:@""]) {
-            [self showHintInView:self.view hint:@"请输入手机号码"];
-            return;
-        }
-        if ([tf4.text isEqualToString:@""]) {
-            [self showHintInView:self.view hint:@"请填写快递单号"];
-            return;
-        }
-        if (image1 == nil) {
-            [self showHintInView:self.view hint:@"请上传内件照"];
-            return;
-        }
-        if (image2 == nil) {
-            [self showHintInView:self.view hint:@"请上传封箱照"];
-            return;
-        }
-        
+                
         //验证通过 添加 当前的数据
         //保存本地图片
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -435,7 +492,7 @@
         
     }
     
-    [self.view endEditing:YES];
+//    [self.view endEditing:YES];
     
     
     
@@ -443,161 +500,130 @@
     
     DLog(@"array:%@",array);
     if (array.count > 0) {
-        [self showHudInView:self.view];
+//        [self showHudInView:self.view];
         
-        MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
-        
-        
-        
-        
-        __block int successCount = 0;
-        for (int i = 0; i < array.count; i++) {
-            NSDictionary *param = [array objectAtIndex:i];
-            
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                hud.mode = MBProgressHUDModeAnnularDeterminate;
-                hud.label.text = [NSString stringWithFormat:@"提交中 %d/%ld",i+1,array.count];
-            });
-            
-            NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
-            
-            [parameters setValue:[param objectForKey:@"name"] forKey:@"name"];//姓名
-            [parameters setValue:[param objectForKey:@"code"] forKey:@"idcard"];//身份证
-            [parameters setValue:[param objectForKey:@"phone"] forKey:@"mobile"];//手机号
-            [parameters setValue:[param objectForKey:@"no"] forKey:@"no"];//单号
-            [parameters setValue:[param objectForKey:@"address"] forKey:@"address"];//地址
-            
-            [parameters setObject:[user objectForKey:@"id"] forKey:@"uid"];
-            [parameters setObject:[user objectForKey:@"token"] forKey:@"tk"];
-            
-            NSString *url = [NSString stringWithFormat:@"%@%@",kHost,kAdd];
-            
-            
-            AFHTTPRequestOperationManager* _manager = [AFHTTPRequestOperationManager manager];
-            
-            _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-            _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-            //    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
-            
-            NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-                
-                
-                UIImage *paramImage1 = [self getDocumentImage:[param objectForKey:@"pic1"]];
-                NSData *data1 = UIImageJPEGRepresentation(paramImage1,1.0f);
-                [formData appendPartWithFileData:data1 name:@"file" fileName:@"1.png" mimeType:@"image/png"];
-                
-                UIImage *paramImage2 = [self getDocumentImage:[param objectForKey:@"pic2"]];
-                NSData *data2 = UIImageJPEGRepresentation(paramImage2,1.0f);
-                [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
-                
-            } error:nil];
-            
-            AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
-                
-                NSLog(@"JSON: %@", responseObject);
-                
-                [self clearInput];
-                
-                
-                //如果成功
-                successCount++;
-                DLog(@"successCount:%d",successCount);
-                
-                //删除文件
-                NSString *aPath1=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic1"]];
-                NSString *aPath2=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic2"]];
-                
-                NSFileManager *fileManager = [NSFileManager defaultManager];
-                BOOL deleteFlag1 = [fileManager removeItemAtPath:aPath1 error:nil];
-                BOOL deleteFlag2 = [fileManager removeItemAtPath:aPath2 error:nil];
-                if (deleteFlag1) {
-                    DLog(@"%@ 文件删除成功",aPath1);
-                }else{
-                    DLog(@"%@ 文件删除失败",aPath1);
-                }
-                if (deleteFlag2) {
-                    DLog(@"%@ 文件删除成功",aPath2);
-                }else{
-                    DLog(@"%@ 文件删除失败",aPath2);
-                }
-                
-                //删除数据库
-                if ([param objectForKey:@"id"]) {
-                    BOOL deleteDbFlag = [DBUtil deleteData:param];
-                    if (deleteDbFlag) {
-                        DLog(@"数据库 删除成功");
-                    }else{
-                        DLog(@"数据库 删除失败");
-                    }
-                }
-                
-                [self setCount];
-                
-                NSNumber *num1 = [NSNumber numberWithInt:successCount];
-                NSNumber *num2 = [NSNumber numberWithLong:array.count];
-                DLog(@"num1 : %d",[num1 intValue]);
-                DLog(@"num2 : %d",[num2 intValue]);
-                if ([num1 intValue] == [num2 intValue]) {
-//                    [self hideHud];
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                        UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-                        hud.customView = imageView;
-                        hud.mode = MBProgressHUDModeCustomView;
-                        hud.label.text = [NSString stringWithFormat:@"%@ %d 个",@"提交成功",successCount];
-                        
-                    });
-                    [hud hideAnimated:YES afterDelay:1.5];
-                }
-                
-                
-                //        NSString *transString = [NSString stringWithString:[responseObject stringByRemovingPercentEncoding]];
-                //        NSLog(@"transString:%@",transString);
-                
-                //        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
-                //
-                //        NSNumber *code = [dic objectForKey:@"code"];
-                //        if ([code intValue] == 0) {
-                //            dispatch_async(dispatch_get_main_queue(), ^{
-                //                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                //                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-                //                hud.customView = imageView;
-                //                hud.mode = MBProgressHUDModeCustomView;
-                //                hud.label.text = @"提交成功";
-                //
-                //            });
-                //            [hud hideAnimated:YES afterDelay:1.5];
-                //        }else{
-                //            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
-                //        }
-            } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
-                NSLog(@"发生错误！%@",error);
-                [self hideHud];
-            }];
-            
-            [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
-                //        DLog(@"%f",(float)totalBytesWritten/totalBytesExpectedToWrite);
-                float progress = (float)totalBytesWritten/totalBytesExpectedToWrite;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    hud.progress = progress;
-                });
-            }];
-            
-            [operation start];
-            
-        }
-        
-        
-        
+        [self submitToServer:array index:0];
     }else{
+        [self hideHud];
         [self showHintInView:self.view hint:@"暂无数据提交"];
     }
+}
+
+-(void)submitToServer:(NSArray *)array index:(int)index{
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
     
     
+    NSDictionary *param = [array objectAtIndex:index];
     
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        hud.mode = MBProgressHUDModeAnnularDeterminate;
+        hud.label.text = [NSString stringWithFormat:@"提交中 %d/%ld",index+1,array.count];
+    });
+    
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+    
+    [parameters setValue:[param objectForKey:@"name"] forKey:@"name"];//姓名
+    [parameters setValue:[param objectForKey:@"code"] forKey:@"idcard"];//身份证
+    [parameters setValue:[param objectForKey:@"phone"] forKey:@"mobile"];//手机号
+    [parameters setValue:[param objectForKey:@"no"] forKey:@"no"];//单号
+    [parameters setValue:[param objectForKey:@"address"] forKey:@"address"];//地址
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *user = [ud objectForKey:LOGINED_USER];
+    [parameters setObject:[user objectForKey:@"id"] forKey:@"uid"];
+    [parameters setObject:[user objectForKey:@"token"] forKey:@"tk"];
+    
+    NSString *url = [NSString stringWithFormat:@"%@%@",kHost,kAdd];
+    
+    
+    AFHTTPRequestOperationManager* _manager = [AFHTTPRequestOperationManager manager];
+    
+    _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    //    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
+    
+    NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        
+        UIImage *paramImage1 = [self getDocumentImage:[param objectForKey:@"pic1"]];
+        NSData *data1 = UIImageJPEGRepresentation(paramImage1,1.0f);
+        [formData appendPartWithFileData:data1 name:@"file" fileName:@"1.png" mimeType:@"image/png"];
+        
+        UIImage *paramImage2 = [self getDocumentImage:[param objectForKey:@"pic2"]];
+        NSData *data2 = UIImageJPEGRepresentation(paramImage2,1.0f);
+        [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
+        
+    } error:nil];
+    
+    AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
+        
+        NSLog(@"JSON: %@", responseObject);
+        
+        [self clearInput];
+        
+        //删除文件
+        NSString *aPath1=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic1"]];
+        NSString *aPath2=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic2"]];
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL deleteFlag1 = [fileManager removeItemAtPath:aPath1 error:nil];
+        BOOL deleteFlag2 = [fileManager removeItemAtPath:aPath2 error:nil];
+        if (deleteFlag1) {
+            DLog(@"%@ 文件删除成功",aPath1);
+        }else{
+            DLog(@"%@ 文件删除失败",aPath1);
+        }
+        if (deleteFlag2) {
+            DLog(@"%@ 文件删除成功",aPath2);
+        }else{
+            DLog(@"%@ 文件删除失败",aPath2);
+        }
+        
+        //删除数据库
+        if ([param objectForKey:@"id"]) {
+            BOOL deleteDbFlag = [DBUtil deleteData:param];
+            if (deleteDbFlag) {
+                DLog(@"数据库 删除成功");
+            }else{
+                DLog(@"数据库 删除失败");
+            }
+        }
+        
+        [self setCount];
+        
+        NSNumber *num1 = [NSNumber numberWithInt:index];
+        NSNumber *num2 = [NSNumber numberWithLong:array.count];
+        DLog(@"index:%d count:%d",[num1 intValue],[num2 intValue]);
+        if ([num1 intValue] < [num2 intValue]-1) {
+            [self submitToServer:array index:index+1];
+        }else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                hud.customView = imageView;
+                hud.mode = MBProgressHUDModeCustomView;
+                hud.label.text = [NSString stringWithFormat:@"提交完成"];
+                
+            });
+            [hud hideAnimated:YES afterDelay:1.5];
+        }
+    } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
+        NSLog(@"发生错误！%@",error);
+        [self hideHud];
+    }];
+    //进度条要做修改
+    [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+        //        DLog(@"%f",(float)totalBytesWritten/totalBytesExpectedToWrite);
+        float progress = (float)totalBytesWritten/totalBytesExpectedToWrite;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            hud.progress = progress;
+        });
+    }];
+    
+    [operation start];
+        
     
 }
 
@@ -845,7 +871,13 @@
         NSDictionary* testdic = BMKConvertBaiduCoorFrom(myLocation.coordinate,BMK_COORDTYPE_GPS);
         CLLocationCoordinate2D coor = BMKCoorDictionaryDecode(testdic);
         _reverseGeoCodeOption.reverseGeoPoint = coor;
-        [_geoCodeSearch reverseGeoCode:_reverseGeoCodeOption];
+        BOOL flag = [_geoCodeSearch reverseGeoCode:_reverseGeoCodeOption];
+        if (flag) {
+            
+        }else{
+            DLog(@"获取位置信息失败，请重试");
+            [self hideHud];
+        }
         
         
 //        //ios自带反地理编码
@@ -883,7 +915,7 @@
 ////        NSLog(@"%d",poi.epoitype);
 //        NSLog(@"%@",poi.address);
 //        
-//    }
+//
     NSLog(@"result.address:%@",result.address);
     address = result.address;
     if (saveTag == 1) {

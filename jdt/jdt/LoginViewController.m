@@ -55,8 +55,8 @@
     
     [_loginBtn addTarget:self action:@selector(login) forControlEvents:UIControlEventTouchUpInside];
     
-    _account.text = @"1111111";
-    _password.text = @"1111111";
+//    _account.text = @"1111111";
+//    _password.text = @"1111111";
 }
 
 //隐藏键盘
@@ -122,7 +122,7 @@
             [nc.navigationBar setTintColor:RGB(50, 54, 66)];
             
             [self presentViewController:nc animated:YES completion:^{
-                //        self.view.window.rootViewController = slideSegmentController;
+                self.view.window.rootViewController = nc;
             }];
         }else{
             [self showHintInView:self.view hint:[dic objectForKey:@"message"]];

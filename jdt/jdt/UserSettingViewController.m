@@ -8,6 +8,7 @@
 
 #import "UserSettingViewController.h"
 #import "UIImage+Color.h"
+#import "LoginViewController.h"
 
 @interface UserSettingViewController (){
     UILabel *contentLabel;
@@ -35,6 +36,9 @@
     label1.textAlignment = NSTextAlignmentCenter;
     label1.font = BOLDSYSTEMFONT(19);
     [self.view addSubview:label1];
+    
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithTitle:@"退出" style:UIBarButtonItemStyleDone target:self action:@selector(logoutAction)];
+    self.navigationItem.rightBarButtonItem = rightItem;
     
     UILabel *line = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(label1.frame) + 20, Main_Screen_Width, 1)];
     line.backgroundColor = [UIColor blackColor];
@@ -129,10 +133,35 @@
             contentLabel.attributedText = attributeString;
             
         }else{
-            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
+            NSString *message = [dic objectForKey:@"message"];
+            [self showHintInView:self.view hint:message];
+            if ([message isEqualToString:@"签名错误"]) {
+                [self performSelector:@selector(logout) withObject:nil afterDelay:1.5];
+            }
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [self hideHud];
+    }];
+}
+
+-(void)logoutAction{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"退出登录" message:@"是否要退出登录?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"退出" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self logout];
+    }];
+    UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:action1];
+    [alert addAction:action2];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+//退出
+-(void)logout{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud removeObjectForKey:LOGINED_USER];
+    LoginViewController *vc = [[LoginViewController alloc] init];
+    [self presentViewController:vc animated:YES completion:^{
+        self.view.window.rootViewController = vc;
     }];
 }
 
