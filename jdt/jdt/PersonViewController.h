@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import<CoreLocation/CoreLocation.h>
 
 @interface PersonViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UIScrollView *myScrollView;
-
+@property (strong, nonatomic) CLLocationManager *locationManager;
 
 @end

@@ -129,7 +129,7 @@
             contentLabel.attributedText = attributeString;
             
         }else{
-            [self showHintInView:self.view hint:@"获取收件数量失败"];
+            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [self hideHud];

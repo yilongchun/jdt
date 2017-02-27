@@ -22,7 +22,12 @@
 
 #import "LBXScanViewController.h"
 
-@interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>{
+#import "DBUtil.h"
+
+#import <BaiduMapAPI_Search/BMKSearchComponent.h>
+#import <BaiduMapAPI_Utils/BMKUtilsComponent.h>
+
+@interface PersonViewController ()<IDCamCotrllerDelegate,DRCamCotrllerDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,CLLocationManagerDelegate,BMKGeoCodeSearchDelegate>{
     UITextField *tf1;
     UITextField *tf2;
     UITextField *tf3;
@@ -36,6 +41,14 @@
     UIButton *imgBtn2;
     
     UILabel *countLabel;
+    
+    CLLocation *myLocation;
+    
+    BMKGeoCodeSearch *_geoCodeSearch;
+    BMKReverseGeoCodeOption *_reverseGeoCodeOption;
+    
+    NSString *address;
+    NSInteger saveTag;
 }
 
 @end
@@ -56,6 +69,23 @@
     
     [DictManager InitDict];
     
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    [self.locationManager requestWhenInUseAuthorization];
+    
+    if (_geoCodeSearch==nil) {
+        //初始化地理编码类
+        _geoCodeSearch = [[BMKGeoCodeSearch alloc]init];
+        _geoCodeSearch.delegate = self;
+        
+    }
+    if (_reverseGeoCodeOption==nil) {
+        //初始化反地理编码类
+        _reverseGeoCodeOption= [[BMKReverseGeoCodeOption alloc] init];
+    }
+
+    
     UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"个人设置" style:UIBarButtonItemStyleDone target:self action:@selector(setting)];
     [item1 setTintColor:[UIColor whiteColor]];
     
@@ -63,8 +93,9 @@
     
     UIView *itemView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 40)];
     UIButton *saveBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 40)];
+    saveBtn.tag = 1;
     [saveBtn setTitle:@"保存" forState:UIControlStateNormal];
-    [saveBtn addTarget:self action:@selector(saveToLocal) forControlEvents:UIControlEventTouchUpInside];
+    [saveBtn addTarget:self action:@selector(location:) forControlEvents:UIControlEventTouchUpInside];
     [saveBtn setTitleColor:RGBA(255, 255, 255, 0.2) forState:UIControlStateHighlighted];
     saveBtn.titleLabel.font = SYSTEMFONT(17);
 //    saveBtn.backgroundColor = [UIColor grayColor];
@@ -99,6 +130,7 @@
     
     tf2 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(label1.frame) + 20, Main_Screen_Width - 150 -20, 40)];
     tf2.borderStyle = UITextBorderStyleNone;
+    tf2.keyboardType = UIKeyboardTypeNumberPad;
     tf2.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf2];
     
@@ -149,6 +181,7 @@
     
     tf4 = [[UITextField alloc] initWithFrame:CGRectMake(150, CGRectGetMaxY(btn2Label.frame) + 20, Main_Screen_Width - 150 -20, 40)];
     tf4.borderStyle = UITextBorderStyleNone;
+    tf4.keyboardType = UIKeyboardTypeNumberPad;
     tf4.backgroundColor = [UIColor lightGrayColor];
     [_myScrollView addSubview:tf4];
     
@@ -177,7 +210,8 @@
     [_myScrollView addSubview:dhBtn];
     
     UIButton *submitBtn = [[UIButton alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(dhBtn.frame) + 20, Main_Screen_Width - 30, 40)];
-    [submitBtn addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
+    submitBtn.tag = 2;
+    [submitBtn addTarget:self action:@selector(location:) forControlEvents:UIControlEventTouchUpInside];
     [submitBtn setTitle:@"提交" forState:UIControlStateNormal];
     [submitBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
     [submitBtn setBackgroundImage:[UIImage imageWithColor:RGB(29, 206, 119) size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
@@ -193,7 +227,12 @@
 
 //本地数量
 -(void)setCount{
-    countLabel.text = [NSString stringWithFormat:@"(%d条)",0];
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *user = [ud objectForKey:LOGINED_USER];
+    countLabel.text = [NSString stringWithFormat:@"(%d条)",[[DBUtil queryCount:[user objectForKey:@"id"]] intValue]];
+    
+    
+    [DBUtil queryData:[user objectForKey:@"id"]];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -208,13 +247,11 @@
     tf4.text = text.userInfo[@"danhao"];
 }
 
--(void)saveToLocal{
-    
-}
+#define FMDBQuickCheck(SomeBool) { if (!(SomeBool)) { NSLog(@"Failure on line %d", __LINE__); abort(); } }
 
-//提交
--(void)submit{
-    
+//保存到本地
+-(void)saveToLocal{
+    DLog(@"saveToLocal");
     if ([tf1.text isEqualToString:@""]) {
         [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
         return;
@@ -243,82 +280,325 @@
     [self.view endEditing:YES];
     
     [self showHudInView:self.view];
-    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        hud.mode = MBProgressHUDModeAnnularDeterminate;
-        hud.label.text = @"上传中";
-    });
-    
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
-    
-    [parameters setValue:tf1.text forKey:@"name"];//姓名
-    [parameters setValue:tf2.text forKey:@"idcard"];//身份证
-    [parameters setValue:tf3.text forKey:@"mobile"];//手机号
-    [parameters setValue:tf4.text forKey:@"no"];//单号
-    
     
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSDictionary *user = [ud objectForKey:LOGINED_USER];
-    [parameters setObject:[user objectForKey:@"id"] forKey:@"uid"];
-    [parameters setObject:[user objectForKey:@"token"] forKey:@"tk"];
     
-    NSString *url = [NSString stringWithFormat:@"%@%@",kHost,kAdd];
+    //保存本地图片
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyyMMddHHmmss"];
+    NSString *currentDateStr = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSLog(@"%@",currentDateStr);
+    
+    NSString *pic1 = [NSString stringWithFormat:@"%@_%@_1.png",[user objectForKey:@"id"],currentDateStr];
+    NSString *pic2 = [NSString stringWithFormat:@"%@_%@_2.png",[user objectForKey:@"id"],currentDateStr];
+    
+    [self saveImageDocuments:image1 path:pic1];
+    [self saveImageDocuments:image2 path:pic2];
+    
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     
     
-    AFHTTPRequestOperationManager* _manager = [AFHTTPRequestOperationManager manager];
+    [parameters setObject:[user objectForKey:@"id"] forKey:@"userid"];
+    [parameters setValue:tf1.text forKey:@"name"];//姓名
+    [parameters setValue:tf2.text forKey:@"code"];//身份证
+    [parameters setValue:tf3.text forKey:@"phone"];//手机号
+    [parameters setValue:tf4.text forKey:@"no"];//单号
+    [parameters setValue:address forKey:@"address"];//地址
+    [parameters setValue:pic1 forKey:@"pic1"];//内件照
+    [parameters setValue:pic2 forKey:@"pic2"];//封箱照
     
-    _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-//    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
+    BOOL f = [DBUtil insertData:parameters];
     
-    NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-        
-        NSData *data1 = UIImageJPEGRepresentation(image1,1.0f);
-        [formData appendPartWithFileData:data1 name:@"file" fileName:@"1.png" mimeType:@"image/png"];
-        NSData *data2 = UIImageJPEGRepresentation(image2,1.0f);
-        [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
-        
-    } error:nil];
+    [DBUtil queryData:[user objectForKey:@"id"]];
     
-    AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
-        [self hideHud];
-        NSLog(@"JSON: %@", responseObject);
-        
-//        NSString *transString = [NSString stringWithString:[responseObject stringByRemovingPercentEncoding]];
-//        NSLog(@"transString:%@",transString);
-        
-//        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
-//        
-//        NSNumber *code = [dic objectForKey:@"code"];
-//        if ([code intValue] == 0) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-//                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-//                hud.customView = imageView;
-//                hud.mode = MBProgressHUDModeCustomView;
-//                hud.label.text = @"提交成功";
-//                
-//            });
-//            [hud hideAnimated:YES afterDelay:1.5];
-//        }else{
-//            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
-//        }
-    } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
-        NSLog(@"发生错误！%@",error);
-        [self hideHud];
-    }];
     
-    [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
-//        DLog(@"%f",(float)totalBytesWritten/totalBytesExpectedToWrite);
-        float progress = (float)totalBytesWritten/totalBytesExpectedToWrite;
+    [self setCount];
+    
+    [self hideHud];
+    if (f) {
+        [self clearInput];
+        [self showHintInView:self.view hint:@"数据保存成功"];
+    }else{
+        [self showHintInView:self.view hint:@"数据保存失败"];
+    }
+}
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            hud.progress = progress;
-        });
-    }];  
+//清空输入框
+-(void)clearInput{
+    tf1.text = @"";
+    tf2.text = @"";
+    tf3.text = @"";
+    tf4.text = @"";
+    address = @"";
+    image1 = nil;
+    image2 = nil;
+    [imgBtn1 setImage:nil forState:UIControlStateNormal];
+    [imgBtn2 setImage:nil forState:UIControlStateNormal];
+}
+//定位
+-(void)location:(UIButton *)btn{
+    if ([CLLocationManager locationServicesEnabled]) { // 判断是否打开了位置服务
+        saveTag = btn.tag;
+        [self.locationManager startUpdatingLocation];//开始定位
+    }else{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"定位服务已经关闭" message:@"请进入系统【设置】>【隐私】>【定位服务】中打开开关，并允许本应用使用定位服务" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil];
+        [alert addAction:action];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+}
+
+//提交
+-(void)submit{
+    DLog(@"submit");
+    BOOL checkflag = NO;
     
-    [operation start];
+    if (![tf1.text isEqualToString:@""]) {
+        checkflag = YES;
+    }
+    if (![tf2.text isEqualToString:@""]) {
+        checkflag = YES;
+    }
+    if (![tf3.text isEqualToString:@""]) {
+        checkflag = YES;
+    }
+    if (![tf4.text isEqualToString:@""]) {
+        checkflag = YES;
+    }
+    if (image1 != nil) {
+        checkflag = YES;
+    }
+    if (image2 != nil) {
+        checkflag = YES;
+    }
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *user = [ud objectForKey:LOGINED_USER];
+    NSMutableArray *array = [NSMutableArray array];
+    
+    //有数据 就要验证
+    if (checkflag) {
+        
+        if ([tf1.text isEqualToString:@""]) {
+            [self showHintInView:self.view hint:@"请填写寄件人姓名" ];
+            return;
+        }
+        if ([tf2.text isEqualToString:@""]) {
+            [self showHintInView:self.view hint:@"请填写身份证号码"];
+            return;
+        }
+        if ([tf3.text isEqualToString:@""]) {
+            [self showHintInView:self.view hint:@"请输入手机号码"];
+            return;
+        }
+        if ([tf4.text isEqualToString:@""]) {
+            [self showHintInView:self.view hint:@"请填写快递单号"];
+            return;
+        }
+        if (image1 == nil) {
+            [self showHintInView:self.view hint:@"请上传内件照"];
+            return;
+        }
+        if (image2 == nil) {
+            [self showHintInView:self.view hint:@"请上传封箱照"];
+            return;
+        }
+        
+        //验证通过 添加 当前的数据
+        //保存本地图片
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyyMMddHHmmss"];
+        NSString *currentDateStr = [dateFormatter stringFromDate:[NSDate date]];
+        
+        NSLog(@"%@",currentDateStr);
+        
+        NSString *pic1 = [NSString stringWithFormat:@"%@_%@_1.png",[user objectForKey:@"id"],currentDateStr];
+        NSString *pic2 = [NSString stringWithFormat:@"%@_%@_2.png",[user objectForKey:@"id"],currentDateStr];
+        
+        [self saveImageDocuments:image1 path:pic1];
+        [self saveImageDocuments:image2 path:pic2];
+        
+        NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+        
+        
+        [parameters setObject:[user objectForKey:@"id"] forKey:@"userid"];
+        [parameters setValue:tf1.text forKey:@"name"];//姓名
+        [parameters setValue:tf2.text forKey:@"code"];//身份证
+        [parameters setValue:tf3.text forKey:@"phone"];//手机号
+        [parameters setValue:tf4.text forKey:@"no"];//单号
+        [parameters setValue:address forKey:@"address"];//地址
+        [parameters setValue:pic1 forKey:@"pic1"];//内件照
+        [parameters setValue:pic2 forKey:@"pic2"];//封箱照
+        [array addObject:parameters];
+        
+    }
+    
+    [self.view endEditing:YES];
+    
+    
+    
+    [array addObjectsFromArray:[DBUtil queryData:[user objectForKey:@"id"]]];
+    
+    DLog(@"array:%@",array);
+    if (array.count > 0) {
+        [self showHudInView:self.view];
+        
+        MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
+        
+        
+        
+        
+        __block int successCount = 0;
+        for (int i = 0; i < array.count; i++) {
+            NSDictionary *param = [array objectAtIndex:i];
+            
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                hud.mode = MBProgressHUDModeAnnularDeterminate;
+                hud.label.text = [NSString stringWithFormat:@"提交中 %d/%ld",i+1,array.count];
+            });
+            
+            NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+            
+            [parameters setValue:[param objectForKey:@"name"] forKey:@"name"];//姓名
+            [parameters setValue:[param objectForKey:@"code"] forKey:@"idcard"];//身份证
+            [parameters setValue:[param objectForKey:@"phone"] forKey:@"mobile"];//手机号
+            [parameters setValue:[param objectForKey:@"no"] forKey:@"no"];//单号
+            [parameters setValue:[param objectForKey:@"address"] forKey:@"address"];//地址
+            
+            [parameters setObject:[user objectForKey:@"id"] forKey:@"uid"];
+            [parameters setObject:[user objectForKey:@"token"] forKey:@"tk"];
+            
+            NSString *url = [NSString stringWithFormat:@"%@%@",kHost,kAdd];
+            
+            
+            AFHTTPRequestOperationManager* _manager = [AFHTTPRequestOperationManager manager];
+            
+            _manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+            _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+            //    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"text/json", @"text/plain", @"text/html", nil];
+            
+            NSMutableURLRequest* request = [_manager.requestSerializer multipartFormRequestWithMethod:@"POST" URLString:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+                
+                
+                UIImage *paramImage1 = [self getDocumentImage:[param objectForKey:@"pic1"]];
+                NSData *data1 = UIImageJPEGRepresentation(paramImage1,1.0f);
+                [formData appendPartWithFileData:data1 name:@"file" fileName:@"1.png" mimeType:@"image/png"];
+                
+                UIImage *paramImage2 = [self getDocumentImage:[param objectForKey:@"pic2"]];
+                NSData *data2 = UIImageJPEGRepresentation(paramImage2,1.0f);
+                [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
+                
+            } error:nil];
+            
+            AFHTTPRequestOperation *operation = [_manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation * _Nonnull operation, id  _Nonnull responseObject) {
+                
+                NSLog(@"JSON: %@", responseObject);
+                
+                [self clearInput];
+                
+                
+                //如果成功
+                successCount++;
+                DLog(@"successCount:%d",successCount);
+                
+                //删除文件
+                NSString *aPath1=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic1"]];
+                NSString *aPath2=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic2"]];
+                
+                NSFileManager *fileManager = [NSFileManager defaultManager];
+                BOOL deleteFlag1 = [fileManager removeItemAtPath:aPath1 error:nil];
+                BOOL deleteFlag2 = [fileManager removeItemAtPath:aPath2 error:nil];
+                if (deleteFlag1) {
+                    DLog(@"%@ 文件删除成功",aPath1);
+                }else{
+                    DLog(@"%@ 文件删除失败",aPath1);
+                }
+                if (deleteFlag2) {
+                    DLog(@"%@ 文件删除成功",aPath2);
+                }else{
+                    DLog(@"%@ 文件删除失败",aPath2);
+                }
+                
+                //删除数据库
+                if ([param objectForKey:@"id"]) {
+                    BOOL deleteDbFlag = [DBUtil deleteData:param];
+                    if (deleteDbFlag) {
+                        DLog(@"数据库 删除成功");
+                    }else{
+                        DLog(@"数据库 删除失败");
+                    }
+                }
+                
+                [self setCount];
+                
+                NSNumber *num1 = [NSNumber numberWithInt:successCount];
+                NSNumber *num2 = [NSNumber numberWithLong:array.count];
+                DLog(@"num1 : %d",[num1 intValue]);
+                DLog(@"num2 : %d",[num2 intValue]);
+                if ([num1 intValue] == [num2 intValue]) {
+//                    [self hideHud];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                        UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                        hud.customView = imageView;
+                        hud.mode = MBProgressHUDModeCustomView;
+                        hud.label.text = [NSString stringWithFormat:@"%@ %d 个",@"提交成功",successCount];
+                        
+                    });
+                    [hud hideAnimated:YES afterDelay:1.5];
+                }
+                
+                
+                //        NSString *transString = [NSString stringWithString:[responseObject stringByRemovingPercentEncoding]];
+                //        NSLog(@"transString:%@",transString);
+                
+                //        NSDictionary *dic= [NSDictionary dictionaryWithDictionary:responseObject];
+                //
+                //        NSNumber *code = [dic objectForKey:@"code"];
+                //        if ([code intValue] == 0) {
+                //            dispatch_async(dispatch_get_main_queue(), ^{
+                //                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                //                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                //                hud.customView = imageView;
+                //                hud.mode = MBProgressHUDModeCustomView;
+                //                hud.label.text = @"提交成功";
+                //
+                //            });
+                //            [hud hideAnimated:YES afterDelay:1.5];
+                //        }else{
+                //            [self showHintInView:self.view hint:[dic objectForKey:@"message"]];
+                //        }
+            } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
+                NSLog(@"发生错误！%@",error);
+                [self hideHud];
+            }];
+            
+            [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+                //        DLog(@"%f",(float)totalBytesWritten/totalBytesExpectedToWrite);
+                float progress = (float)totalBytesWritten/totalBytesExpectedToWrite;
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    hud.progress = progress;
+                });
+            }];
+            
+            [operation start];
+            
+        }
+        
+        
+        
+    }else{
+        [self showHintInView:self.view hint:@"暂无数据提交"];
+    }
+    
+    
+    
+    
 }
 
 -(void)showPic:(UIButton *)btn{
@@ -327,7 +607,7 @@
     btnTag = btn.tag;
     
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
+    
         UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"用户相册" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             
             UIImagePickerController *imagePicker2 = [[UIImagePickerController alloc] init];
@@ -473,20 +753,20 @@
 -(void)saveImageDocuments:(UIImage *)image path:(NSString *)path{
     //拿到图片
     UIImage *imagesave = image;
-    NSString *path_sandox = NSHomeDirectory();
+    NSString *path_sandox = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
     //设置一个图片的存储路径
-    NSString *imagePath = [path_sandox stringByAppendingString:path];
+    NSString *imagePath = [path_sandox stringByAppendingString:[NSString stringWithFormat:@"/%@",path]];
     //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
     [UIImagePNGRepresentation(imagesave) writeToFile:imagePath atomically:YES];
 }
 // 读取并存贮到相册
 -(UIImage *)getDocumentImage:(NSString *)path{
     // 读取沙盒路径图片
-    NSString *aPath3=[NSString stringWithFormat:@"%@%@",NSHomeDirectory(),path];
+    NSString *aPath3=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],path];
     // 拿到沙盒路径图片
     UIImage *imgFromUrl3=[[UIImage alloc]initWithContentsOfFile:aPath3];
     // 图片保存相册
-    UIImageWriteToSavedPhotosAlbum(imgFromUrl3, self, nil, nil);
+//    UIImageWriteToSavedPhotosAlbum(imgFromUrl3, self, nil, nil);
     return imgFromUrl3;
 }
 
@@ -514,15 +794,9 @@
 //        DLog(@"%lu",(unsigned long)data3.length);
 //        
 //        UIImage *timg1 = [UIImage imageWithData:data];
-//        UIImage *timg2 = [UIImage imageWithData:data2];
-//        UIImage *timg3 = [UIImage imageWithData:data3];
-//        [self saveImageDocuments:timg1 path:@"/Documents/test1.png"];
-//        [self saveImageDocuments:timg2 path:@"/Documents/test2.png"];
-//        [self saveImageDocuments:timg3 path:@"/Documents/test3.png"];
-//        
-//        [self getDocumentImage:@"/Documents/test1.png"];
-//        [self getDocumentImage:@"/Documents/test2.png"];
-//        [self getDocumentImage:@"/Documents/test3.png"];
+//        [self saveImageDocuments:image path:@"1.png"];
+//
+//        [self getDocumentImage:@"1.png"];
     }
     [picker dismissViewControllerAnimated:YES completion:^{
         
@@ -552,5 +826,82 @@
     //        return;
     //    }
 }
+
+#pragma mark - CLLocationManagerDelegate
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    id firstLocation = [locations firstObject];
+    myLocation = (CLLocation *)firstLocation;
+    if (myLocation) {
+        DLog(@"已获取到定位信息 %f %f",myLocation.coordinate.latitude,myLocation.coordinate.longitude);
+//        self.locationManager.delegate = nil;
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager stopUpdatingHeading];
+        
+        
+        
+        //需要逆地理编码的坐标位置
+        NSDictionary* testdic = BMKConvertBaiduCoorFrom(myLocation.coordinate,BMK_COORDTYPE_GPS);
+        CLLocationCoordinate2D coor = BMKCoorDictionaryDecode(testdic);
+        _reverseGeoCodeOption.reverseGeoPoint = coor;
+        [_geoCodeSearch reverseGeoCode:_reverseGeoCodeOption];
+        
+        
+//        //ios自带反地理编码
+//        //创建地理编码对象
+//        CLGeocoder *geocoder=[[CLGeocoder alloc]init];
+//        //反地理编码
+//        [geocoder reverseGeocodeLocation:myLocation completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+//            //判断是否有错误或者placemarks是否为空
+//            if (error !=nil || placemarks.count==0) {
+//                NSLog(@"%@",error);
+//                return ;
+//            }
+//            for (CLPlacemark *placemark in placemarks) {
+//                //赋值详细地址  
+//                NSLog(@"%@",placemark.name);
+//                NSLog(@"%@",placemark.thoroughfare);
+//                NSLog(@"%@",placemark.subThoroughfare);
+//                NSLog(@"%@",placemark.locality);
+//                NSLog(@"%@",placemark.subLocality);
+//                NSLog(@"%@",placemark.administrativeArea);
+//                NSLog(@"%@",placemark.postalCode);
+//                NSLog(@"%@",placemark.ISOcountryCode);
+//                NSLog(@"%@",placemark.country);
+//                NSLog(@"%@",placemark.inlandWater);
+//                NSLog(@"%@",placemark.ocean);
+//                
+//            }  
+//        }];
+    }
+}
+
+- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error{
+//    for (BMKPoiInfo *poi in result.poiList) {
+////        NSLog(@"%@",poi.name);//周边建筑名
+////        NSLog(@"%d",poi.epoitype);
+//        NSLog(@"%@",poi.address);
+//        
+//    }
+    NSLog(@"result.address:%@",result.address);
+    address = result.address;
+    if (saveTag == 1) {
+        [self saveToLocal];
+    }else if (saveTag == 2){
+        [self submit];
+    }
+    
+   
+    
+}
+
+//    NSMutableString *str = [NSMutableString string];
+//    
+//    [str appendFormat:@"%@\n\n",myLocation];
+//    [str appendFormat:@"latitude:%f longitude:%f altitude:%f",myLocation.coordinate.latitude,myLocation.coordinate.longitude,myLocation.altitude];
+//    
+//    debugLabel.text = str;
+//    NSLog(@"%f %f ",myLocation.coordinate.latitude,myLocation.coordinate.longitude);
 
 @end

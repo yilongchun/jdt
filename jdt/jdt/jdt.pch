@@ -23,6 +23,8 @@
 
 #define kHost @"http://115.29.103.36:88/"
 
+#define kBaiduAk @"NHOQ8gsPbOD2o26QKND0Djm7HkpG1CDe"
+
 //登录
 #define kLogin @"courier/login"
 //当日收件数量
