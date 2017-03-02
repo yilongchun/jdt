@@ -15,5 +15,8 @@
 @property (weak, nonatomic) IBOutlet UITextField *account;
 @property (weak, nonatomic) IBOutlet UITextField *password;
 
+//@property (weak, nonatomic) IBOutlet UIImageView *titleImageView;
+//@property (weak, nonatomic) IBOutlet UIImageView *logoImageView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *accountY;
 
 @end

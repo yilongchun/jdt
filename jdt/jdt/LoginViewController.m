@@ -24,6 +24,51 @@
     
 //    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
+    
+   
+       
+        
+    UIImageView *titleImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"1"]];
+    UIImageView *logoImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"4"]];
+    
+    
+    
+    if (IS_IPHONE6P) {
+        [titleImageView setFrame:CGRectMake((Main_Screen_Width - titleImageView.frame.size.width)/2, 50, titleImageView.frame.size.width, titleImageView.frame.size.height)];
+        [self.view addSubview:titleImageView];
+        [logoImageView setFrame:CGRectMake((Main_Screen_Width - logoImageView.frame.size.width)/2, CGRectGetMaxY(titleImageView.frame) + 20, logoImageView.frame.size.width, logoImageView.frame.size.height)];
+    }
+    if (IS_IPHONE6) {
+        [titleImageView setFrame:CGRectMake((Main_Screen_Width - titleImageView.frame.size.width)/2, 30, titleImageView.frame.size.width, titleImageView.frame.size.height)];
+        [self.view addSubview:titleImageView];
+        [logoImageView setFrame:CGRectMake((Main_Screen_Width - logoImageView.frame.size.width)/2, CGRectGetMaxY(titleImageView.frame) + 10, logoImageView.frame.size.width, logoImageView.frame.size.height)];
+    }
+    if (IS_IPHONE5) {
+        [titleImageView setFrame:CGRectMake((Main_Screen_Width - titleImageView.frame.size.width)/2, 20, titleImageView.frame.size.width, titleImageView.frame.size.height)];
+        [self.view addSubview:titleImageView];
+        
+        CGSize logoSize = logoImageView.frame.size;
+        logoSize.width -=77;
+        logoSize.height -=53;
+        [logoImageView setFrame:CGRectMake((Main_Screen_Width - logoSize.width)/2, CGRectGetMaxY(titleImageView.frame) + 10, logoSize.width, logoSize.height)];
+    }
+    if (IS_IPHONE4) {
+        [titleImageView setFrame:CGRectMake((Main_Screen_Width - titleImageView.frame.size.width)/2, 20, titleImageView.frame.size.width, titleImageView.frame.size.height)];
+        [self.view addSubview:titleImageView];
+        
+        CGSize logoSize = logoImageView.frame.size;
+        logoSize.width -=77*1.5;
+        logoSize.height -=53*1.5;
+        [logoImageView setFrame:CGRectMake((Main_Screen_Width - logoSize.width)/2, CGRectGetMaxY(titleImageView.frame) + 10, logoSize.width, logoSize.height)];
+        
+        _accountY.constant = 25;
+    }
+        
+        
+    [self.view addSubview:logoImageView];
+        
+    
+    
     self.view.backgroundColor = RGB(50, 54, 66);
     
     UIView *accountLeftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];

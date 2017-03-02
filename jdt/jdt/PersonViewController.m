@@ -560,54 +560,72 @@
         
         NSLog(@"JSON: %@", responseObject);
         
-        [self clearInput];
+        NSString *str=[[NSString alloc]initWithData:responseObject encoding:NSUTF8StringEncoding];
         
-        //删除文件
-        NSString *aPath1=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic1"]];
-        NSString *aPath2=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic2"]];
+        NSData *jsonData = [str dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                            options:NSJSONReadingMutableContainers
+                                                              error:nil];
         
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        BOOL deleteFlag1 = [fileManager removeItemAtPath:aPath1 error:nil];
-        BOOL deleteFlag2 = [fileManager removeItemAtPath:aPath2 error:nil];
-        if (deleteFlag1) {
-            DLog(@"%@ 文件删除成功",aPath1);
-        }else{
-            DLog(@"%@ 文件删除失败",aPath1);
-        }
-        if (deleteFlag2) {
-            DLog(@"%@ 文件删除成功",aPath2);
-        }else{
-            DLog(@"%@ 文件删除失败",aPath2);
-        }
+        DLog(@"%@",dic);
         
-        //删除数据库
-        if ([param objectForKey:@"id"]) {
-            BOOL deleteDbFlag = [DBUtil deleteData:param];
-            if (deleteDbFlag) {
-                DLog(@"数据库 删除成功");
+        NSNumber *code = [dic objectForKey:@"code"];
+        
+        if ([code intValue] == 0) {
+            [self clearInput];
+            
+            //删除文件
+            NSString *aPath1=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic1"]];
+            NSString *aPath2=[NSString stringWithFormat:@"%@/%@",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],[param objectForKey:@"pic2"]];
+            
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            BOOL deleteFlag1 = [fileManager removeItemAtPath:aPath1 error:nil];
+            BOOL deleteFlag2 = [fileManager removeItemAtPath:aPath2 error:nil];
+            if (deleteFlag1) {
+                DLog(@"%@ 文件删除成功",aPath1);
             }else{
-                DLog(@"数据库 删除失败");
+                DLog(@"%@ 文件删除失败",aPath1);
             }
-        }
-        
-        [self setCount];
-        
-        NSNumber *num1 = [NSNumber numberWithInt:index];
-        NSNumber *num2 = [NSNumber numberWithLong:array.count];
-        DLog(@"index:%d count:%d",[num1 intValue],[num2 intValue]);
-        if ([num1 intValue] < [num2 intValue]-1) {
-            [self submitToServer:array index:index+1];
+            if (deleteFlag2) {
+                DLog(@"%@ 文件删除成功",aPath2);
+            }else{
+                DLog(@"%@ 文件删除失败",aPath2);
+            }
+            
+            //删除数据库
+            if ([param objectForKey:@"id"]) {
+                BOOL deleteDbFlag = [DBUtil deleteData:param];
+                if (deleteDbFlag) {
+                    DLog(@"数据库 删除成功");
+                }else{
+                    DLog(@"数据库 删除失败");
+                }
+            }
+            
+            [self setCount];
+            
+            NSNumber *num1 = [NSNumber numberWithInt:index];
+            NSNumber *num2 = [NSNumber numberWithLong:array.count];
+            DLog(@"index:%d count:%d",[num1 intValue],[num2 intValue]);
+            if ([num1 intValue] < [num2 intValue]-1) {
+                [self submitToServer:array index:index+1];
+            }else{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                    hud.customView = imageView;
+                    hud.mode = MBProgressHUDModeCustomView;
+                    hud.label.text = [NSString stringWithFormat:@"提交完成"];
+                    
+                });
+                [hud hideAnimated:YES afterDelay:1.5];
+            }
         }else{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-                hud.customView = imageView;
-                hud.mode = MBProgressHUDModeCustomView;
-                hud.label.text = [NSString stringWithFormat:@"提交完成"];
-                
-            });
-            [hud hideAnimated:YES afterDelay:1.5];
+            [self hideHud];
+            [self showHintInView:self.view hint:@"提交失败"];
         }
+        
+        
     } failure:^(AFHTTPRequestOperation * _Nonnull operation, NSError * _Nonnull error) {
         NSLog(@"发生错误！%@",error);
         [self hideHud];
@@ -623,12 +641,10 @@
     }];
     
     [operation start];
-        
-    
 }
 
 -(void)showPic:(UIButton *)btn{
-    DLog(@"%ld",btn.tag);
+    
     
     btnTag = btn.tag;
     

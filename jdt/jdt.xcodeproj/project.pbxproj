@@ -2720,6 +2720,7 @@
 				);
 				GCC_PREFIX_HEADER = /Users/Chin/Project/jdt/jdt/jdt/jdt.pch;
 				INFOPLIST_FILE = jdt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2742,6 +2743,7 @@
 				);
 				GCC_PREFIX_HEADER = /Users/Chin/Project/jdt/jdt/jdt/jdt.pch;
 				INFOPLIST_FILE = jdt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
