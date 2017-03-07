@@ -287,6 +287,7 @@ CGRect getDRPreViewFrame( int previewWidth, int previewHeight)
     }
     
     [DRCamDelegate didEndRecDRWithResult:drInfo from:self];
+    [self.navigationController popViewControllerAnimated:YES];
     
 }
 

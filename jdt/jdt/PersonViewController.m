@@ -552,7 +552,7 @@
         
         UIImage *paramImage2 = [self getDocumentImage:[param objectForKey:@"pic2"]];
         NSData *data2 = UIImageJPEGRepresentation(paramImage2,1.0f);
-        [formData appendPartWithFileData:data2 name:@"file" fileName:@"2.png" mimeType:@"image/png"];
+        [formData appendPartWithFileData:data2 name:@"file2" fileName:@"2.png" mimeType:@"image/png"];
         
     } error:nil];
     
@@ -648,21 +648,21 @@
     
     btnTag = btn.tag;
     
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
-        UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"用户相册" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            
-            UIImagePickerController *imagePicker2 = [[UIImagePickerController alloc] init];
-            imagePicker2.delegate = self;
-            imagePicker2.allowsEditing = NO;
-            imagePicker2.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-            imagePicker2.mediaTypes =  [[NSArray alloc] initWithObjects:@"public.image", nil];
-            [[imagePicker2 navigationBar] setTintColor:RGB(67,216,230)];
-            [[imagePicker2 navigationBar] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor blackColor], NSForegroundColorAttributeName, nil]];
-            [self presentViewController:imagePicker2 animated:YES completion:nil];
-        }];
-        [alert addAction:action1];
-        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"拍照" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+//    
+//        UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"用户相册" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//            
+//            UIImagePickerController *imagePicker2 = [[UIImagePickerController alloc] init];
+//            imagePicker2.delegate = self;
+//            imagePicker2.allowsEditing = NO;
+//            imagePicker2.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+//            imagePicker2.mediaTypes =  [[NSArray alloc] initWithObjects:@"public.image", nil];
+//            [[imagePicker2 navigationBar] setTintColor:RGB(67,216,230)];
+//            [[imagePicker2 navigationBar] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor blackColor], NSForegroundColorAttributeName, nil]];
+//            [self presentViewController:imagePicker2 animated:YES completion:nil];
+//        }];
+//        [alert addAction:action1];
+//        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"拍照" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             //检查相机模式是否可用
             if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
                 NSLog(@"sorry, no camera or camera is unavailable.");
@@ -674,15 +674,15 @@
             imagePicker1.sourceType = UIImagePickerControllerSourceTypeCamera;
             imagePicker1.mediaTypes =  [[NSArray alloc] initWithObjects:@"public.image", nil];
             [self presentViewController:imagePicker1 animated:YES completion:nil];
-        }];
-        [alert addAction:action2];
-        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            
-        }];
-        [alert addAction:cancel];
-        [self presentViewController:alert animated:YES completion:^{
-            
-        }];
+//        }];
+//        [alert addAction:action2];
+//        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+//            
+//        }];
+//        [alert addAction:cancel];
+//        [self presentViewController:alert animated:YES completion:^{
+//            
+//        }];
 }
 
 -(void)setting{
@@ -776,6 +776,7 @@
         {
             tf1.text = drInfo.name;
             tf2.text = drInfo.cardId;
+            
 //            DRCardResultViewController * DRRstVc = [[DRCardResultViewController alloc] init];
 //            DRRstVc.DRInfo = drInfo;
 //            [vc.navigationController pushViewController:DRRstVc animated:NO];
